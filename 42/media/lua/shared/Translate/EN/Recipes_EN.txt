@@ -1,0 +1,3 @@
+Recipes_EN = {
+    CraftAutoDoorRemote = "Craft Auto Door Remote",
+}

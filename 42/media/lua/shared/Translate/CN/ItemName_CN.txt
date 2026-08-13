@@ -1,0 +1,4 @@
+ItemName_CN = {
+    ItemName_Base.RemoteDoorOpener = "自动门遥控器",
+    ItemName_Base.AutoDoorKey = "自动门钥匙",
+}

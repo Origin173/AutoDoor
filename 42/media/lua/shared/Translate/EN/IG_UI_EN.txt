@@ -1,0 +1,14 @@
+IGUI_EN = {
+    IGUI_AutoDoor_Install = "Install Auto Door Opener",
+    IGUI_AutoDoor_Manage = "Auto Door Opener",
+    IGUI_AutoDoor_RepairPair = "Re-pair With Remote",
+    IGUI_AutoDoor_Uninstall = "Remove Auto Door Opener",
+    IGUI_AutoDoor_NeedRemote = "A remote control is required in your inventory",
+    IGUI_AutoDoor_CannotInstallLocked = "Cannot install on a locked door (unlock it first)",
+    IGUI_AutoDoor_ContextOpen = "Open Door",
+    IGUI_AutoDoor_ContextClose = "Close Door",
+    IGUI_AutoDoor_NoDoorInRange = "No paired auto door in range",
+    IGUI_AutoDoor_DoorLocked = "Door is locked",
+    IGUI_AutoDoor_DebugSpawnRemote = "Debug: Spawn Paired Remote",
+    "Open Door With Remote" = "Open Door With Remote",
+}

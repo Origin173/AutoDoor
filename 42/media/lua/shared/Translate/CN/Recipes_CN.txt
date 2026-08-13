@@ -1,0 +1,3 @@
+Recipes_CN = {
+    CraftAutoDoorRemote = "制作自动门遥控器",
+}
