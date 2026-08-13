@@ -6,7 +6,7 @@ function walk(dir, out = []) {
   for (const f of fs.readdirSync(dir)) {
     const p = path.join(dir, f);
     if (fs.statSync(p).isDirectory()) walk(p, out);
-    else if (f.endsWith(".lua")) out.push(p);
+    else if (f.endsWith(".lua") || f.endsWith(".json")) out.push(p);
   }
   return out;
 }
