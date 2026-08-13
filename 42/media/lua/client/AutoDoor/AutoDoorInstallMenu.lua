@@ -47,7 +47,7 @@ local function remoteTooltip(playerObj)
     if hasRemote(playerObj) then return nil end
     local tooltip = ISToolTip:new(playerObj)
     tooltip:initialise()
-    tooltip:setName(getText("IGUI_AutoDoor_NeedRemote"))
+    tooltip:setName(AutoDoor.text("IGUI_AutoDoor_NeedRemote", "A remote control is required in your inventory"))
     tooltip.description = {}
     return tooltip
 end
@@ -55,7 +55,7 @@ end
 local function lockedTooltip(playerObj)
     local tooltip = ISToolTip:new(playerObj)
     tooltip:initialise()
-    tooltip:setName(getText("IGUI_AutoDoor_CannotInstallLocked"))
+    tooltip:setName(AutoDoor.text("IGUI_AutoDoor_CannotInstallLocked", "Cannot install on a locked door (unlock it first)"))
     tooltip.description = {}
     return tooltip
 end
@@ -114,18 +114,18 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
     if md.autoDoor then
         -- Already automated: manage submenu.
         local subMenu = ISContextMenu:getNew(menu)
-        menu:addSubMenu(menu:addOption(getText("IGUI_AutoDoor_Manage")), subMenu)
-        local rePair = subMenu:addOption(getText("IGUI_AutoDoor_RepairPair"), playerNum,
+        menu:addSubMenu(menu:addOption(AutoDoor.text("IGUI_AutoDoor_Manage", "Auto Door Opener")), subMenu)
+        local rePair = subMenu:addOption(AutoDoor.text("IGUI_AutoDoor_RepairPair", "Re-pair With Remote"), playerNum,
             AutoDoorInstallMenu.onInstall, door)
         rePair.toolTip = remoteTooltip(player)
         if not hasRemote(player) then
             rePair.notAvailable = true
             rePair.onSelect = nil
         end
-        subMenu:addOption(getText("IGUI_AutoDoor_Uninstall"), playerNum,
+        subMenu:addOption(AutoDoor.text("IGUI_AutoDoor_Uninstall", "Remove Auto Door Opener"), playerNum,
             AutoDoorInstallMenu.onUnpair, door)
     else
-        local install = menu:addOption(getText("IGUI_AutoDoor_Install"), playerNum,
+        local install = menu:addOption(AutoDoor.text("IGUI_AutoDoor_Install", "Install Auto Door Opener"), playerNum,
             AutoDoorInstallMenu.onInstall, door)
         install.toolTip = remoteTooltip(player)
         if not hasRemote(player) then
@@ -147,7 +147,7 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
     end
     if not debugOn and getCore and getCore():getDebug() then debugOn = true end
     if debugOn then
-        menu:addOption(getText("IGUI_AutoDoor_DebugSpawnRemote"), playerNum,
+        menu:addOption(AutoDoor.text("IGUI_AutoDoor_DebugSpawnRemote", "Debug: Spawn Paired Remote"), playerNum,
             AutoDoorInstallMenu.onDebugSpawnRemote, door)
     end
 end

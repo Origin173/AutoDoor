@@ -18,6 +18,18 @@ AutoDoor.SEARCH_RADIUS = 12
 -- (fixtures_doors_fences_01_0 .. _131).
 AutoDoor.FENCE_GATE_PREFIX = "fixtures_doors_fences_01_"
 
+-- Translation lookup with a hard fallback. Some setups (e.g. third-party
+-- translation mods) return nil for keys that are not loaded; a nil text
+-- given to a tooltip/menu option crashes the tooltip renderer and spams
+-- the log with errors, so never let nil through.
+function AutoDoor.text(key, fallback)
+    local t = getText(key)
+    if t == nil or t == "" or t == key then
+        return fallback
+    end
+    return t
+end
+
 -- ------------------------------------------------------------
 -- Door type detection (vanilla doors only)
 -- ------------------------------------------------------------

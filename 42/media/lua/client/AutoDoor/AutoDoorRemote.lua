@@ -69,9 +69,9 @@ function AutoDoorRemote.fillInventoryMenu(playerNum, context, items)
     local door = AutoDoor.getNearestDoor(player, doors)
     if not door then return end
 
-    local text = getText("IGUI_AutoDoor_ContextOpen")
+    local text = AutoDoor.text("IGUI_AutoDoor_ContextOpen", "Open Door")
     if door:IsOpen() then
-        text = getText("IGUI_AutoDoor_ContextClose")
+        text = AutoDoor.text("IGUI_AutoDoor_ContextClose", "Close Door")
     end
     context:addOptionOnTop(text, playerNum, AutoDoorRemote.onContextToggle, door)
 end
