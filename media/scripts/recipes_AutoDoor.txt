@@ -1,0 +1,23 @@
+module Base
+{
+	craftRecipe CraftAutoDoorRemote
+	{
+		timedAction = MakingElectrical,
+		time = 90,
+		NeedToBeLearn = false,
+		SkillRequired = Electricity:1,
+		Tags = AnySurfaceCraft,
+		category = Electrical,
+		xpAward = Electricity:5,
+		inputs
+		{
+			item 2 [Base.ElectronicsScrap] flags[NoBrokenItems],
+			item 2 [Base.ElectricWire] flags[NoBrokenItems],
+			item 1 tags[base:screwdriver] mode:keep flags[NoBrokenItems],
+		}
+		outputs
+		{
+			item 1 Base.RemoteDoorOpener,
+		}
+	}
+}

@@ -1,10 +1,10 @@
 name=Auto Door Remote
 id=AutoDoorRemote
-description=Build your own auto garage doors and fence gates, each paired with its own remote control and key. Keep the remote in your inventory and press K (rebindable) to open or close your door without leaving the vehicle. Locked doors are unlocked automatically when you carry the matching key.
+description=Turn vanilla garage doors and fence gates into remote-controlled auto doors. Craft a remote control (Electronics 1), right-click a door to install and pair it — one remote can pair many doors, and you can remove the opener at any time. Keep the remote in your inventory and press K (rebindable) to open or close your doors from the driver's seat. Locked doors still need their original key.
 
-description=建造属于你自己的自动车库门和自动栅栏门，每扇门配套专属遥控器和钥匙。把遥控器放在背包里，按 K（可改键）即可在车内远程开关门。门锁着时，持有匹配钥匙会自动解锁再开。
+description=把原版车库门和围墙栅栏门变成遥控自动门。用电子材料制作遥控器（电学 1 级），右键门\"安装自动开门器\"完成配对——一把遥控器可配对多扇门，随时可移除开门器。把遥控器放在背包里，按 K（可改键）即可在车内远程开关门。已上锁的门仍需要原配钥匙才会自动解锁。
 poster=poster.png
 author=AutoDoor
 versionMin=42.0
-modversion=1.0.0
+modversion=1.1.0
 category=Building

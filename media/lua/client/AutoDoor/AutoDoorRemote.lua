@@ -1,7 +1,9 @@
 --[[
     AutoDoor remote control logic (client).
-    Finds the paired auto door near the player (or their vehicle), unlocks
-    it if the player carries the matching key, then toggles it open/closed.
+    Finds the paired auto door near the player (or their vehicle),
+    unlocks it if the player carries the matching key, then toggles it
+    open/closed. Works from the driver's seat: the search is centred on
+    the vehicle square.
 ]]
 
 require "AutoDoor/AutoDoorDoorLib"
@@ -11,12 +13,17 @@ AutoDoorRemote = {}
 -- Execute one "use the remote" action. Returns true when a door was toggled.
 function AutoDoorRemote.trigger(player)
     if not player then return false end
-    local remote = player:getInventory():getFirstTypeRecurse(AutoDoor.ITEM_REMOTE)
+    local remote = AutoDoor.getRemote(player)
     if not remote then return false end
-    local keyId = remote:getKeyId()
-    local doors = AutoDoor.findPairedDoors(player, keyId)
+    local remoteId = AutoDoor.getRemoteId(remote)
+    if not remoteId then
+        -- Remote never paired with any door yet.
+        player:getEmitter():playSound("RadioButton")
+        return false
+    end
+    local doors = AutoDoor.findPairedDoors(player, remoteId)
     if #doors == 0 then
-        player:getEmitter():playSound("RemoteClick")
+        player:getEmitter():playSound("RadioButton")
         return false
     end
     local door = AutoDoor.getNearestDoor(player, doors)
@@ -24,7 +31,8 @@ function AutoDoorRemote.trigger(player)
 
     -- Locked: unlock with the matching key if the player carries one.
     if door:isLockedByKey() then
-        if player:getInventory():haveThisKeyId(door:getKeyId()) then
+        local keyId = door:checkKeyId()
+        if keyId ~= -1 and player:getInventory():haveThisKeyId(keyId) then
             AutoDoor.unlockDoor(door)
         else
             player:getEmitter():playSound("DoorIsLocked")
@@ -47,8 +55,9 @@ function AutoDoorRemote.fillInventoryMenu(playerNum, context, items)
     if not remote or remote:getFullType() ~= AutoDoor.ITEM_REMOTE then return end
     local player = getSpecificPlayer(playerNum)
     if not player then return end
-    local keyId = remote:getKeyId()
-    local doors = AutoDoor.findPairedDoors(player, keyId)
+    local remoteId = AutoDoor.getRemoteId(remote)
+    if not remoteId then return end
+    local doors = AutoDoor.findPairedDoors(player, remoteId)
     if #doors == 0 then return end
     local door = AutoDoor.getNearestDoor(player, doors)
     if not door then return end
@@ -64,7 +73,8 @@ function AutoDoorRemote.onContextToggle(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
     if door:isLockedByKey() then
-        if player:getInventory():haveThisKeyId(door:getKeyId()) then
+        local keyId = door:checkKeyId()
+        if keyId ~= -1 and player:getInventory():haveThisKeyId(keyId) then
             AutoDoor.unlockDoor(door)
         else
             player:getEmitter():playSound("DoorIsLocked")
