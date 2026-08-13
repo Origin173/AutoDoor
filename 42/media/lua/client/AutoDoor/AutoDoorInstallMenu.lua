@@ -52,6 +52,18 @@ local function remoteTooltip(playerObj)
     return tooltip
 end
 
+-- Debug helper (only visible with the -debug launch option):
+-- spawns a remote already paired with this door, skipping the recipe.
+function AutoDoorInstallMenu.onDebugSpawnRemote(playerNum, door)
+    local player = getSpecificPlayer(playerNum)
+    if not player then return end
+    local remote = instanceItem(AutoDoor.ITEM_REMOTE)
+    if AutoDoor.pairDoor(player, door, remote) then
+        player:getInventory():AddItem(remote)
+        getSoundManager():playUISound("UIActivateButton")
+    end
+end
+
 function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
     local door = AutoDoorInstallMenu.findDoor(worldobjects)
     if not door then return end
@@ -80,6 +92,12 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
             install.notAvailable = true
             install.onSelect = nil
         end
+    end
+
+    -- Debug mode only: one-click paired remote for testing.
+    if isDebugEnabled() then
+        context:addOption(getText("IGUI_AutoDoor_DebugSpawnRemote"), playerNum,
+            AutoDoorInstallMenu.onDebugSpawnRemote, door)
     end
 end
 

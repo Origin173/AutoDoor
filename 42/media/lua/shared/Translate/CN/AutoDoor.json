@@ -8,6 +8,7 @@
     "IGUI_AutoDoor_RepairPair": "重新配对遥控器",
     "IGUI_AutoDoor_Uninstall": "移除自动开门器",
     "IGUI_AutoDoor_NeedRemote": "需要背包里有遥控器",
+    "IGUI_AutoDoor_DebugSpawnRemote": "调试: 生成配对遥控器",
     "IGUI_AutoDoor_ContextOpen": "打开门",
     "IGUI_AutoDoor_ContextClose": "关闭门",
     "IGUI_AutoDoor_NoDoorInRange": "范围内没有配对的自动门",
