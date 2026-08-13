@@ -80,13 +80,24 @@ end
 --   - garage doors: IsoDoor.getGarageDoorPrev/Next
 --   - double doors: IsoDoor.getDoubleDoorObject (slots 1..4)
 -- A regular door is its own unit.
+-- Note: world objects expose no ID method in the Lua API, so parts are
+-- deduplicated by square position + facing + sprite name.
 function AutoDoor.getDoorParts(door)
     local parts = {}
     local seen = {}
+    local function keyOf(obj)
+        local sprite = obj:getSprite()
+        return tostring(obj:getX()) .. "," .. tostring(obj:getY()) .. "," .. tostring(obj:getZ())
+            .. "|" .. tostring(obj:getNorth())
+            .. "|" .. (sprite and sprite:getName() or "")
+    end
     local function add(obj)
-        if obj and not seen[obj:getID()] then
-            seen[obj:getID()] = true
-            table.insert(parts, obj)
+        if obj then
+            local k = keyOf(obj)
+            if not seen[k] then
+                seen[k] = true
+                table.insert(parts, obj)
+            end
         end
     end
     if not door then return parts end
