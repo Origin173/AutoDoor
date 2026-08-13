@@ -1,0 +1,19 @@
+{
+    "RemoteDoorOpener": "自动门遥控器",
+    "AutoDoorKey": "自动门钥匙",
+    "Tooltip_RemoteDoorOpener": "与自动门配对的遥控器。放在背包里，靠近门时按下按键即可远程开关门，无需下车。",
+    "Open Door With Remote": "用遥控器开门",
+    "IGUI_AutoDoor_BuildMenu": "建造自动门",
+    "IGUI_AutoDoor_GarageDoor": "自动车库门",
+    "IGUI_AutoDoor_GarageDoor_01": "灰色卷帘车库门",
+    "IGUI_AutoDoor_GarageDoor_02": "白色卷帘车库门",
+    "IGUI_AutoDoor_GarageDoor_03": "白色面板车库门",
+    "IGUI_AutoDoor_FenceGate": "自动栅栏门",
+    "IGUI_AutoDoor_FenceGate_Wire": "金属网自动门",
+    "IGUI_AutoDoor_FenceGate_Pole": "金属杆自动门",
+    "IGUI_AutoDoor_FenceGate_Wood": "木制自动门",
+    "IGUI_AutoDoor_ContextOpen": "打开门",
+    "IGUI_AutoDoor_ContextClose": "关闭门",
+    "IGUI_AutoDoor_NoDoorInRange": "范围内没有配对的自动门",
+    "IGUI_AutoDoor_DoorLocked": "门已上锁"
+}

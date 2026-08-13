@@ -1,0 +1,19 @@
+{
+    "RemoteDoorOpener": "Auto Door Remote",
+    "AutoDoorKey": "Auto Door Key",
+    "Tooltip_RemoteDoorOpener": "A remote control paired with an auto door. Keep it in your inventory and press the key while near your door to open or close it.",
+    "Open Door With Remote": "Open Door With Remote",
+    "IGUI_AutoDoor_BuildMenu": "Build Auto Door",
+    "IGUI_AutoDoor_GarageDoor": "Auto Garage Door",
+    "IGUI_AutoDoor_GarageDoor_01": "Grey Roller Garage Door",
+    "IGUI_AutoDoor_GarageDoor_02": "White Roller Garage Door",
+    "IGUI_AutoDoor_GarageDoor_03": "White Panel Garage Door",
+    "IGUI_AutoDoor_FenceGate": "Auto Fence Gate",
+    "IGUI_AutoDoor_FenceGate_Wire": "Wire Fence Auto Gate",
+    "IGUI_AutoDoor_FenceGate_Pole": "Metal Pole Auto Gate",
+    "IGUI_AutoDoor_FenceGate_Wood": "Wooden Auto Gate",
+    "IGUI_AutoDoor_ContextOpen": "Open Door",
+    "IGUI_AutoDoor_ContextClose": "Close Door",
+    "IGUI_AutoDoor_NoDoorInRange": "No paired auto door in range",
+    "IGUI_AutoDoor_DoorLocked": "Door is locked"
+}
