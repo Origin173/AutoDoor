@@ -78,17 +78,43 @@ function AutoDoorInstallMenu.onDebugSpawnRemote(playerNum, door)
     end
 end
 
+-- The vanilla "Door" submenu (with Open/Lock) is created by the engine
+-- before OnFillWorldObjectContextMenu fires. Find it so our options sit
+-- right next to "Open Door", inside 门 > . Falls back to nil (top level).
+function AutoDoorInstallMenu.findDoorSubMenu(context)
+    if not context or not context.options then return nil end
+    local doorTitles = {
+        getText("ContextMenu_Door_option"),
+        getText("ContextMenu_Door"),
+    }
+    for _, opt in ipairs(context.options) do
+        if opt and opt.subOption ~= nil and opt.name then
+            for _, title in ipairs(doorTitles) do
+                if opt.name == title then
+                    local subMenu = context:getSubMenu(opt.subOption)
+                    if subMenu then return subMenu end
+                end
+            end
+        end
+    end
+    return nil
+end
+
 function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
     local door = AutoDoorInstallMenu.findDoor(worldobjects)
     if not door then return end
     local player = getSpecificPlayer(playerNum)
     if not player or player:isDead() then return end
 
+    -- Our options go inside the vanilla "Door" submenu, next to
+    -- Open/Lock; fall back to the top level if it is not there.
+    local menu = AutoDoorInstallMenu.findDoorSubMenu(context) or context
+
     local md = door:getModData()
     if md.autoDoor then
         -- Already automated: manage submenu.
-        local subMenu = ISContextMenu:getNew(context)
-        context:addSubMenu(context:addOption(getText("IGUI_AutoDoor_Manage")), subMenu)
+        local subMenu = ISContextMenu:getNew(menu)
+        menu:addSubMenu(menu:addOption(getText("IGUI_AutoDoor_Manage")), subMenu)
         local rePair = subMenu:addOption(getText("IGUI_AutoDoor_RepairPair"), playerNum,
             AutoDoorInstallMenu.onInstall, door)
         rePair.toolTip = remoteTooltip(player)
@@ -99,7 +125,7 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
         subMenu:addOption(getText("IGUI_AutoDoor_Uninstall"), playerNum,
             AutoDoorInstallMenu.onUnpair, door)
     else
-        local install = context:addOption(getText("IGUI_AutoDoor_Install"), playerNum,
+        local install = menu:addOption(getText("IGUI_AutoDoor_Install"), playerNum,
             AutoDoorInstallMenu.onInstall, door)
         install.toolTip = remoteTooltip(player)
         if not hasRemote(player) then
@@ -121,7 +147,7 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
     end
     if not debugOn and getCore and getCore():getDebug() then debugOn = true end
     if debugOn then
-        context:addOption(getText("IGUI_AutoDoor_DebugSpawnRemote"), playerNum,
+        menu:addOption(getText("IGUI_AutoDoor_DebugSpawnRemote"), playerNum,
             AutoDoorInstallMenu.onDebugSpawnRemote, door)
     end
 end
