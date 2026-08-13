@@ -1,10 +1,10 @@
 --[[
     AutoDoor remote control logic (client).
     Finds the paired auto door near the player (or their vehicle) and
-    toggles it open/closed. The remote is the door opener: locked doors
-    are opened without needing the original key (the lock is bypassed).
-    Works from the driver's seat: the search is centred on the vehicle
-    square.
+    toggles it open/closed. The remote only simplifies the open/close
+    action: it does NOT bypass locks - a locked door refuses to open
+    (vanilla behaviour). Works from the driver's seat: the search is
+    centred on the vehicle square.
 ]]
 
 require "AutoDoor/AutoDoorDoorLib"
@@ -30,10 +30,11 @@ function AutoDoorRemote.trigger(player)
     local door = AutoDoor.getNearestDoor(player, doors)
     if not door then return false end
 
-    -- The remote opens/closes the door: a locked door is unlocked first
-    -- without requiring the original key.
+    -- Locked doors stay locked: the remote only simplifies opening/
+    -- closing, it does not unlock.
     if door:isLockedByKey() then
-        AutoDoor.unlockDoor(door)
+        player:getEmitter():playSound("DoorIsLocked")
+        return false
     end
 
     local ok = AutoDoor.toggleDoor(player, door)
@@ -78,9 +79,10 @@ end
 function AutoDoorRemote.onContextToggle(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
-    -- Remote opens/closes the door regardless of the lock state.
+    -- The remote only simplifies open/close: locked doors refuse to open.
     if door:isLockedByKey() then
-        AutoDoor.unlockDoor(door)
+        player:getEmitter():playSound("DoorIsLocked")
+        return
     end
     AutoDoor.toggleDoor(player, door)
 end

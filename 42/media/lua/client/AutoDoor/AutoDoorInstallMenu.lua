@@ -52,6 +52,20 @@ local function remoteTooltip(playerObj)
     return tooltip
 end
 
+local function lockedTooltip(playerObj)
+    local tooltip = ISToolTip:new(playerObj)
+    tooltip:initialise()
+    tooltip:setName(getText("IGUI_AutoDoor_CannotInstallLocked"))
+    tooltip.description = {}
+    return tooltip
+end
+
+-- The opener can only be installed on an unlocked door: the remote
+-- simply automates the open/close action and never bypasses locks.
+local function canInstallOn(door)
+    return not door:isLockedByKey()
+end
+
 -- Debug helper (only visible with the -debug launch option):
 -- spawns a remote already paired with this door, skipping the recipe.
 function AutoDoorInstallMenu.onDebugSpawnRemote(playerNum, door)
@@ -91,6 +105,11 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
         if not hasRemote(player) then
             install.notAvailable = true
             install.onSelect = nil
+        elseif not canInstallOn(door) then
+            -- Locked doors cannot be paired: the remote never bypasses locks.
+            install.notAvailable = true
+            install.onSelect = nil
+            install.toolTip = lockedTooltip(player)
         end
     end
 
