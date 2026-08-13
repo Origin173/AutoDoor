@@ -1,9 +1,10 @@
 --[[
     AutoDoor remote control logic (client).
-    Finds the paired auto door near the player (or their vehicle),
-    unlocks it if the player carries the matching key, then toggles it
-    open/closed. Works from the driver's seat: the search is centred on
-    the vehicle square.
+    Finds the paired auto door near the player (or their vehicle) and
+    toggles it open/closed. The remote is the door opener: locked doors
+    are opened without needing the original key (the lock is bypassed).
+    Works from the driver's seat: the search is centred on the vehicle
+    square.
 ]]
 
 require "AutoDoor/AutoDoorDoorLib"
@@ -29,16 +30,10 @@ function AutoDoorRemote.trigger(player)
     local door = AutoDoor.getNearestDoor(player, doors)
     if not door then return false end
 
-    -- Locked: unlock with the matching key if the player carries one.
+    -- The remote opens/closes the door: a locked door is unlocked first
+    -- without requiring the original key.
     if door:isLockedByKey() then
-        local keyId = door:checkKeyId()
-        if keyId ~= -1 and player:getInventory():haveThisKeyId(keyId) then
-            AutoDoor.unlockDoor(door)
-        else
-            player:getEmitter():playSound("DoorIsLocked")
-            getSoundManager():playUISound("UIActivateButton")
-            return false
-        end
+        AutoDoor.unlockDoor(door)
     end
 
     local ok = AutoDoor.toggleDoor(player, door)
@@ -83,14 +78,9 @@ end
 function AutoDoorRemote.onContextToggle(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
+    -- Remote opens/closes the door regardless of the lock state.
     if door:isLockedByKey() then
-        local keyId = door:checkKeyId()
-        if keyId ~= -1 and player:getInventory():haveThisKeyId(keyId) then
-            AutoDoor.unlockDoor(door)
-        else
-            player:getEmitter():playSound("DoorIsLocked")
-            return
-        end
+        AutoDoor.unlockDoor(door)
     end
     AutoDoor.toggleDoor(player, door)
 end

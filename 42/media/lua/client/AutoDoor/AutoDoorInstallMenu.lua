@@ -95,7 +95,13 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
     end
 
     -- Debug mode only: one-click paired remote for testing.
-    if isDebugEnabled() then
+    local debugOn = false
+    if isDebugEnabled then
+        local ok, res = pcall(isDebugEnabled)
+        if ok and res then debugOn = true end
+    end
+    if not debugOn and getCore and getCore():getDebug() then debugOn = true end
+    if debugOn then
         context:addOption(getText("IGUI_AutoDoor_DebugSpawnRemote"), playerNum,
             AutoDoorInstallMenu.onDebugSpawnRemote, door)
     end

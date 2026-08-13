@@ -1,7 +1,7 @@
 {
     "RemoteDoorOpener": "Auto Door Remote",
     "AutoDoorKey": "Auto Door Key",
-    "Tooltip_RemoteDoorOpener": "A handmade electronic remote. Right-click a garage door or fence gate and choose \"Install Auto Door Opener\" to pair it. Keep the remote in your inventory and press the key while seated in a vehicle to open or close your doors without getting out. One remote can pair with many doors.",
+    "Tooltip_RemoteDoorOpener": "A handmade electronic remote. Right-click a garage door or fence gate and choose \"Install Auto Door Opener\" to pair it. Keep the remote in your inventory and press the key while seated in a vehicle to open or close your doors without getting out. One remote can pair with many doors, and locked doors can be opened directly.",
     "Open Door With Remote": "Open Door With Remote",
     "IGUI_AutoDoor_Install": "Install Auto Door Opener",
     "IGUI_AutoDoor_Manage": "Auto Door Opener",

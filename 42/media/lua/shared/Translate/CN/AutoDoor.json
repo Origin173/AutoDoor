@@ -1,7 +1,7 @@
 {
     "RemoteDoorOpener": "自动门遥控器",
     "AutoDoorKey": "自动门钥匙",
-    "Tooltip_RemoteDoorOpener": "电子手工制作的遥控器。先对车库门或围墙栅栏门右键\"安装自动开门器\"完成配对，把遥控器放在背包里，坐在车内按下按键即可远程开关门，无需下车。一把遥控器可以配对多扇门。",
+    "Tooltip_RemoteDoorOpener": "电子手工制作的遥控器。先对车库门或围墙栅栏门右键\"安装自动开门器\"完成配对，把遥控器放在背包里，坐在车内按下按键即可远程开关门，无需下车。一把遥控器可以配对多扇门，上锁的门也能直接打开。",
     "Open Door With Remote": "用遥控器开门",
     "IGUI_AutoDoor_Install": "安装自动开门器",
     "IGUI_AutoDoor_Manage": "自动开门器",
