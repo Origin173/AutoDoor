@@ -1,0 +1,4 @@
+name=Auto Door Test
+id=AutoDoorTest
+description=Mod list visibility test mod. If you can see this, local mods are scanned correctly.
+poster=poster.png
