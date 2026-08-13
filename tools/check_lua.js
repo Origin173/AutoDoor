@@ -12,7 +12,7 @@ function walk(dir, out = []) {
 }
 
 let fail = 0;
-for (const file of walk(path.join(__dirname, "..", "media", "lua"))) {
+for (const file of walk(path.join(__dirname, "..", "42", "media", "lua"))) {
   let src = fs.readFileSync(file, "utf8");
   src = src.replace(/--\[\[[\s\S]*?\]\]/g, " ").replace(/--[^\n]*/g, " ");
   src = src.replace(/"(?:[^"\\]|\\.)*"/g, '""').replace(/'(?:[^'\\]|\\.)*'/g, "''");
@@ -38,7 +38,7 @@ for (const file of walk(path.join(__dirname, "..", "media", "lua"))) {
   }
 }
 // also verify json files parse
-for (const file of walk(path.join(__dirname, "..", "media", "lua"))) {
+for (const file of walk(path.join(__dirname, "..", "42", "media", "lua"))) {
   if (file.endsWith(".json")) {
     try {
       JSON.parse(fs.readFileSync(file, "utf8"));
