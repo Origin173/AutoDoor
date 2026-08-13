@@ -19,7 +19,7 @@
 - 多格车库门 / 双扇大门按整扇处理（原生链式动画与同步）
 
 ## 安装 / 启用
-1. 开发目录：`D:\Code\autodoor\`（本仓库根）
+1. 开发目录：`D:\Code\autodoor\`（本仓库根，B42 标准结构：`42/` 版本文件夹）
 2. 已部署到本地 mods：`C:\Users\Origin\Zomboid\mods\AutoDoorRemote\`
 3. 启动游戏 → 主菜单 **Mods** → 勾选 `Auto Door Remote` → 新建/加载存档
    （旧存档可在 载入→更多… 中给存档启用 mod）
@@ -68,23 +68,33 @@
   并发处理。
 - 与旧版（建造式）存档兼容：旧建造的门仍可用旧遥控器开；旧钥匙物品保留定义。
 
-## 文件结构
+## 文件结构（B42 标准布局，参照官方 wiki Mod structure）
 ```
-mod.info
+mod.info                                 — 根 mod.info（游戏靠它识别 mod）
 poster.png
-media/
-├── scripts/
-│   ├── items_AutoDoor.txt          # 遥控器（+旧版钥匙，兼容存档）物品定义
-│   └── recipes_AutoDoor.txt        # 遥控器制作配方（craftRecipe, 电学1级）
-├── textures/                       # 自绘图标 (Item_*.png)
-└── lua/
-    ├── shared/AutoDoor/AutoDoorDoorLib.lua        # 门识别/链/配对/遥控共享库
-    ├── shared/Translate/{EN,CN}/AutoDoor.json     # 翻译
-    └── client/AutoDoor/
-        ├── AutoDoorInstallMenu.lua  # 右键门：安装/重新配对/移除
-        ├── AutoDoorRemote.lua       # 遥控核心逻辑 + 右键遥控器菜单
-        └── AutoDoorKeybind.lua      # 按键注册（默认 K）+ 按键处理
+42/                                      — 版本文件夹（B42 必需：没有 common/ 或版本文件夹
+│   ├── mod.info                            的 mod 不会被游戏识别）
+│   ├── poster.png
+│   └── media/
+│       ├── scripts/
+│       │   ├── items_AutoDoor.txt      # 遥控器（+旧版钥匙，兼容存档）物品定义
+│       │   └── recipes_AutoDoor.txt    # 遥控器制作配方（craftRecipe, 电学1级）
+│       ├── textures/                   # 自绘图标 (Item_*.png)
+│       └── lua/
+│           ├── shared/AutoDoor/AutoDoorDoorLib.lua        # 门识别/链/配对/遥控共享库
+│           ├── shared/Translate/{EN,CN}/AutoDoor.json     # 翻译
+│           └── client/AutoDoor/
+│               ├── AutoDoorInstallMenu.lua  # 右键门：安装/重新配对/移除
+│               ├── AutoDoorRemote.lua       # 遥控核心逻辑 + 右键遥控器菜单
+│               └── AutoDoorKeybind.lua      # 按键注册（默认 K）+ 按键处理
 tools/gen_icons.js   # 图标/poster 生成器（Node，无依赖）
 tools/check_lua.js   # Lua 结构自检
 tools/dump_tiles.js  # 原版 tile 属性枚举工具（开发用）
 ```
+
+## 本地安装（B42）
+1. 本地 mod 放在**缓存目录**：`C:\Users\<用户名>\Zomboid\mods\AutoDoorRemote\`
+   （B42 只识别 `Zomboid\mods\` 和 `Zomboid\Workshop\` 两个目录；游戏安装目录里的
+   `ProjectZomboid\Workshop` 不能用于 mod）
+2. 本机已部署：`C:\Users\Origin\Zomboid\mods\AutoDoorRemote\`
+3. 启动游戏 → 主菜单 **Mods** → 勾选 `Auto Door Remote` → 新建/加载存档
