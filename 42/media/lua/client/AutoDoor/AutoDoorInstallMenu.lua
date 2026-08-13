@@ -48,7 +48,9 @@ local function remoteTooltip(playerObj)
     local tooltip = ISToolTip:new(playerObj)
     tooltip:initialise()
     tooltip:setName(AutoDoor.text("IGUI_AutoDoor_NeedRemote", "A remote control is required in your inventory"))
-    tooltip.description = {}
+    -- description stays at its default "" (empty string): an empty TABLE
+    -- would crash the tooltip renderer (ISToolTip.layoutContents only
+    -- guards against "").
     return tooltip
 end
 
@@ -56,7 +58,6 @@ local function lockedTooltip(playerObj)
     local tooltip = ISToolTip:new(playerObj)
     tooltip:initialise()
     tooltip:setName(AutoDoor.text("IGUI_AutoDoor_CannotInstallLocked", "Cannot install on a locked door (unlock it first)"))
-    tooltip.description = {}
     return tooltip
 end
 
