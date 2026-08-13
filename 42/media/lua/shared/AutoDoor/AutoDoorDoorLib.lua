@@ -43,12 +43,31 @@ end
 
 function AutoDoor.isAutomatableDoor(object)
     return AutoDoor.isGarageDoor(object) or AutoDoor.isFenceGate(object)
+        or AutoDoor.isBuiltDoor(object)
+end
+
+-- Doors built by the player (carpentry / metalworking) are IsoThumpable
+-- doors carrying the build-material ModData ("need:...") written by
+-- buildUtil.setInfo. Worldgen doors never have that marker.
+function AutoDoor.isBuiltDoor(object)
+    if not instanceof(object, "IsoThumpable") then return false end
+    if not object:isDoor() then return false end
+    local md = object:getModData()
+    if not md then return false end
+    for key, _ in pairs(md) do
+        if type(key) == "string" and key:sub(1, 5) == "need:" then
+            return true
+        end
+    end
+    return false
 end
 
 -- True when the door has been automated by this mod
 -- (installed opener, or a door built by the old version of the mod).
 function AutoDoor.isAutoDoor(object)
-    if not instanceof(object, "IsoDoor") then return false end
+    if not (instanceof(object, "IsoDoor") or instanceof(object, "IsoThumpable")) then
+        return false
+    end
     local md = object:getModData()
     return md ~= nil and (md.autoDoor == true or md.remoteKeyId ~= nil)
 end
@@ -84,8 +103,12 @@ function AutoDoor.getDoorParts(door)
             cur = IsoDoor.getGarageDoorNext(cur)
         end
     end
-    for i = 1, 4 do
-        add(IsoDoor.getDoubleDoorObject(door, i))
+    -- Double-door chains are only linked natively for IsoDoor objects;
+    -- built (IsoThumpable) double doors toggle per part.
+    if instanceof(door, "IsoDoor") then
+        for i = 1, 4 do
+            add(IsoDoor.getDoubleDoorObject(door, i))
+        end
     end
     return parts
 end
