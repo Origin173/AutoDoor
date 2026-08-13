@@ -50,8 +50,19 @@ end
 
 -- Right-click menu on the remote item (works on foot too).
 function AutoDoorRemote.fillInventoryMenu(playerNum, context, items)
-    if not items or #items == 0 then return end
-    local remote = items[1]
+    if not items then return end
+    -- items can contain InventoryItem objects or inventory "group" objects
+    -- (which carry an .items list); find the first real item.
+    local remote = nil
+    for _, it in ipairs(items) do
+        if instanceof(it, "InventoryItem") then
+            remote = it
+            break
+        elseif it.items and #it.items > 0 and instanceof(it.items[1], "InventoryItem") then
+            remote = it.items[1]
+            break
+        end
+    end
     if not remote or remote:getFullType() ~= AutoDoor.ITEM_REMOTE then return end
     local player = getSpecificPlayer(playerNum)
     if not player then return end

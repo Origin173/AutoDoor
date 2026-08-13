@@ -65,8 +65,8 @@ function AutoDoor.getDoorParts(door)
     local parts = {}
     local seen = {}
     local function add(obj)
-        if obj and not seen[obj:getId()] then
-            seen[obj:getId()] = true
+        if obj and not seen[obj:getID()] then
+            seen[obj:getID()] = true
             table.insert(parts, obj)
         end
     end
