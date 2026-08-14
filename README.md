@@ -1,4 +1,4 @@
-# AutoDoorRemote 自动门遥控器 (Project Zomboid B42)
+# Auto Door 自动门遥控器 (Project Zomboid B42)
 
 把原版**车库门**和**围墙栅栏门**变成遥控自动门：用电子材料做出**遥控器**和**自动门电机**（信号接收器+电机一体机，需装电池），给门安装配对后，把遥控器放背包里，坐在车里按 **K** 即可远程开关门，**无需下车**。门的外观、大小、贴图和开合动画**完全保持原版**——本 mod 不替换门对象、不修改原版文件。
 
@@ -14,7 +14,7 @@
 
 ## 安装
 1. 把 `mod.info`、`poster.png`、`42/` 放入 `C:\Users\<用户名>\Zomboid\mods\AutoDoorRemote\`（B42 只识别 `Zomboid\mods\` 与 `Zomboid\Workshop\` 两个目录）
-2. 启动游戏 → 主菜单 **Mods** → 勾选 `Auto Door Remote`
+2. 启动游戏 → 主菜单 **Mods** → 勾选 `Auto Door`
 
 ## 使用
 1. 找到**自动门杂志**并阅读，学会配方
