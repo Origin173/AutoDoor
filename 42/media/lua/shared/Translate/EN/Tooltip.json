@@ -1,5 +1,5 @@
 {
     "Tooltip_RemoteDoorOpener": "A handmade electronic remote. Install a signal receiver + motor unit on an unlocked garage door, fence gate or a door you built yourself, then pair it with this remote. Keep the remote in your inventory and press the key while seated in a vehicle to open or close your doors without getting out. One remote can pair with many doors. The remote only sends the signal - it never bypasses locks.",
     "Tooltip_AutoDoorMotor": "A combined signal receiver and electric motor. Install it on an unlocked garage door, fence gate or a door you built yourself to open and close it with a paired remote. Requires a battery to work: every open/close consumes charge. Replace the battery from the door's menu when it runs out.",
-    "Tooltip_AutoDoorMagazine": "\"On Making Automatic Doors\". Reading it teaches you how to craft the auto door remote and the signal receiver + motor unit."
+    "Tooltip_AutoDoorMagazine": "Reading it teaches you how to craft the auto door remote and the auto door motor recipes."
 }
