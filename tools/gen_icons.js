@@ -225,17 +225,25 @@ function drawMagazine(c) {
 // ---------- main ----------
 const root = path.join(__dirname, "..");
 const texDir = path.join(root, "42", "media", "textures");
+// AI-generated art (kept in tools/ai_originals/) takes precedence over the
+// procedural placeholders: never overwrite it.
+const userArt = (name) => fs.existsSync(path.join(root, "tools", "ai_originals", name + ".png"));
+const writeIcon = (c, name) => {
+  const file = path.join(texDir, name + ".png");
+  if (userArt(name)) { console.log("skip (AI art exists):", name); return; }
+  writePNG(c, file);
+};
 
 const remoteIcon = canvas(128, 128);
 drawRemote(remoteIcon, 64, 64, 1);
-writePNG(remoteIcon, path.join(texDir, "Item_RemoteDoorOpener.png"));
+writeIcon(remoteIcon, "Item_RemoteDoorOpener");
 
 const motorIcon = canvas(128, 128);
 drawMotor(motorIcon);
-writePNG(motorIcon, path.join(texDir, "Item_AutoDoorMotor.png"));
+writeIcon(motorIcon, "Item_AutoDoorMotor");
 
 const magazineIcon = canvas(128, 128);
 drawMagazine(magazineIcon);
-writePNG(magazineIcon, path.join(texDir, "Item_AutoDoorMagazine.png"));
+writeIcon(magazineIcon, "Item_AutoDoorMagazine");
 
 writePNG(drawPoster(), path.join(root, "poster.png"));

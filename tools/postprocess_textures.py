@@ -4,6 +4,11 @@ AutoDoor Mod 贴图后处理脚本
 功能：批量去背景、缩放、格式转换、验证
 依赖：Pillow (pip install Pillow)
 用法：python postprocess_textures.py --input-dir ./raw_outputs --output-dir ./42/media/textures
+
+注意：当前 42/media/textures 里的三张物品图是 AI 生成的深色背景原图
+（1024x1024，已备份到 tools/ai_originals/），由人工精修后替换。
+本脚本的去白底逻辑仅适用于白底图；深色背景请改用
+tools/process_ai_images.js（Node，无依赖）或手动处理。
 """
 
 import argparse
@@ -22,10 +27,8 @@ except ImportError:
 # 贴图配置
 TEXTURE_CONFIG = {
     "Item_RemoteDoorOpener": {"size": (128, 128), "type": "item_icon"},
-    "Item_AutoDoorKey": {"size": (128, 128), "type": "item_icon"},
+    "Item_AutoDoorMotor": {"size": (128, 128), "type": "item_icon"},
     "Item_AutoDoorMagazine": {"size": (128, 128), "type": "item_icon"},
-    "Item_AutoGarageDoor": {"size": (128, 128), "type": "item_icon"},
-    "Item_AutoFenceGate": {"size": (128, 128), "type": "item_icon"},
     "poster": {"size": (512, 256), "type": "banner"},
 }
 
