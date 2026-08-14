@@ -1,5 +1,5 @@
 -- B42 keybind: entries in the global keyBinding table show up in Options > Key Bindings (default Period key).
-require "AutoDoor/AutoDoorRemote"
+require "AutoDoor/AutoDoorControl"
 
 local BIND_CATEGORY = "[AutoDoor]"
 local BIND_NAME = "Open Door With Remote"
@@ -20,7 +20,7 @@ local function onKeyStartPressed(key)
     if UIManager.getSpeedControls() and UIManager.getSpeedControls():isKeyConsumed(key) then
         return
     end
-    AutoDoorRemote.trigger(getPlayer())
+    AutoDoorControl.trigger(getPlayer())
 end
 
 registerKeyBind()

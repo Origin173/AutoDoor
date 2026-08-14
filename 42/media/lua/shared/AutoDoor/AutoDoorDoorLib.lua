@@ -114,7 +114,7 @@ end
 -- Pairing id stored on the remote's ModData.
 function AutoDoor.getRemoteId(remote)
     if not remote then return nil end
-    local id = remote:getModData().autoDoorRemoteId
+    local id = remote:getModData().autoDoorId
     if id and id > 0 then return id end
     return nil
 end
@@ -139,7 +139,7 @@ function AutoDoor.ensureRemoteId(player, remote)
     local id = AutoDoor.getRemoteId(remote)
     if id then return id end
     id = ZombRand(100000, 999999)
-    remote:getModData().autoDoorRemoteId = id
+    remote:getModData().autoDoorId = id
     if isClient() and syncItemModData then
         syncItemModData(player, remote)
     end

@@ -1,6 +1,6 @@
 module Base
 {
-	craftRecipe CraftAutoDoorRemote
+	craftRecipe CraftAutoDoor
 	{
 		timedAction = MakingElectrical,
 		time = 90,

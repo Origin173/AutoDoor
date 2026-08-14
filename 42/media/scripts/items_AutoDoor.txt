@@ -33,7 +33,7 @@ module Base
         Icon = AutoDoorMagazine,
         BoredomChange = -20,
         StressChange = -15,
-        LearnedRecipes = CraftAutoDoorRemote;CraftAutoDoorMotor,
+        LearnedRecipes = CraftAutoDoor;CraftAutoDoorMotor,
         StaticModel = Magazine,
         WorldStaticModel = MagazineGround,
         Tags = base:magazine,

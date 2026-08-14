@@ -1,10 +1,10 @@
 -- Client remote logic: toggles paired doors near the player or their vehicle.
 require "AutoDoor/AutoDoorDoorLib"
 
-AutoDoorRemote = {}
+AutoDoorControl = {}
 
 -- Returns true when a door was toggled.
-function AutoDoorRemote.trigger(player)
+function AutoDoorControl.trigger(player)
     if not player then return false end
     local remote = AutoDoor.getRemote(player)
     if not remote then return false end
@@ -42,7 +42,7 @@ function AutoDoorRemote.trigger(player)
 end
 
 -- Right-click menu on the remote item (works on foot too).
-function AutoDoorRemote.fillInventoryMenu(playerNum, context, items)
+function AutoDoorControl.fillInventoryMenu(playerNum, context, items)
     if not items then return end
     -- items may hold inventory group objects (with an .items list)
     local remote = nil
@@ -69,10 +69,10 @@ function AutoDoorRemote.fillInventoryMenu(playerNum, context, items)
     if door:IsOpen() then
         text = AutoDoor.text("IGUI_AutoDoor_ContextClose", "Close Door")
     end
-    context:addOptionOnTop(text, playerNum, AutoDoorRemote.onContextToggle, door)
+    context:addOptionOnTop(text, playerNum, AutoDoorControl.onContextToggle, door)
 end
 
-function AutoDoorRemote.onContextToggle(playerNum, door)
+function AutoDoorControl.onContextToggle(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
     if door:isLockedByKey() then
@@ -88,4 +88,4 @@ function AutoDoorRemote.onContextToggle(playerNum, door)
     end
 end
 
-Events.OnFillInventoryObjectContextMenu.Add(AutoDoorRemote.fillInventoryMenu)
+Events.OnFillInventoryObjectContextMenu.Add(AutoDoorControl.fillInventoryMenu)
