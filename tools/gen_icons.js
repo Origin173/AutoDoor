@@ -143,29 +143,6 @@ function drawRemote(c, ox, oy, s) {
   fillCircle(c, x0 + w / 2, y0 + Math.round(76 * s), Math.round(3.5 * s), GREEN);
 }
 
-// ---------- key icon (128x128) ----------
-function drawKey(c) {
-  // ring
-  ring(c, 50, 46, 24, 14, GOLD);
-  ring(c, 50, 46, 24, 14, GOLD_DARK); // outline
-  ring(c, 50, 46, 23, 15, GOLD_LIGHT);
-  ring(c, 50, 46, 24, 14, GOLD);
-  // shaft
-  fillRect(c, 44, 66, 58, 104, GOLD);
-  fillRect(c, 44, 66, 58, 104, GOLD_DARK);
-  fillRect(c, 45, 67, 57, 103, GOLD_LIGHT);
-  // teeth
-  fillRect(c, 58, 86, 66, 92, GOLD);
-  fillRect(c, 58, 86, 66, 92, GOLD_DARK);
-  fillRect(c, 59, 87, 65, 91, GOLD_LIGHT);
-  fillRect(c, 58, 96, 66, 102, GOLD);
-  fillRect(c, 58, 96, 66, 102, GOLD_DARK);
-  fillRect(c, 59, 97, 65, 101, GOLD_LIGHT);
-  fillRect(c, 40, 76, 44, 82, GOLD);
-  fillRect(c, 40, 76, 44, 82, GOLD_DARK);
-  fillRect(c, 41, 77, 43, 81, GOLD_LIGHT);
-}
-
 // ---------- garage door icon (128x128) ----------
 function drawGarageDoor(c) {
   // frame
@@ -299,10 +276,6 @@ writePNG(motorIcon, path.join(texDir, "Item_AutoDoorMotor.png"));
 const magazineIcon = canvas(128, 128);
 drawMagazine(magazineIcon);
 writePNG(magazineIcon, path.join(texDir, "Item_AutoDoorMagazine.png"));
-
-const keyIcon = canvas(128, 128);
-drawKey(keyIcon);
-writePNG(keyIcon, path.join(texDir, "Item_AutoDoorKey.png"));
 
 const garageIcon = canvas(128, 128);
 drawGarageDoor(garageIcon);

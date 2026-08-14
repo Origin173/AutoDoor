@@ -38,14 +38,4 @@ module Base
         WorldStaticModel = MagazineGround,
         Tags = base:magazine,
     }
-
-    item AutoDoorKey
-    {
-        DisplayCategory = Security,
-        ItemType = base:key,
-        Weight = 0.05,
-        Icon = AutoDoorKey,
-        DisplayName = AutoDoorKey,
-        Tags = base:buildingkey;base:fitswallet;base:hasmetal,
-    }
 }

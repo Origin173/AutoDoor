@@ -7,7 +7,7 @@
     "IGUI_AutoDoor_NeedRemote": "需要背包里有遥控器",
     "IGUI_AutoDoor_NeedItems": "需要背包里有：遥控器、自动门电机、电池",
     "IGUI_AutoDoor_NeedBattery": "需要背包里有电池",
-    "IGUI_AutoDoor_CannotInstallLocked": "门已上锁，无法安装（只能给未上锁的门安装）",
+    "IGUI_AutoDoor_CannotInstallLocked": "门已上锁，无法安装",
     "IGUI_AutoDoor_ContextOpen": "打开门",
     "IGUI_AutoDoor_ContextClose": "关闭门",
     "IGUI_AutoDoor_NoDoorInRange": "范围内没有配对的自动门",

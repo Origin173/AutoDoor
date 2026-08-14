@@ -7,7 +7,7 @@
     "IGUI_AutoDoor_NeedRemote": "A remote control is required in your inventory",
     "IGUI_AutoDoor_NeedItems": "Requires in inventory: a remote, an auto door motor and a battery",
     "IGUI_AutoDoor_NeedBattery": "A battery is required in your inventory",
-    "IGUI_AutoDoor_CannotInstallLocked": "Cannot install on a locked door (unlock it first)",
+    "IGUI_AutoDoor_CannotInstallLocked": "Cannot install on a locked door",
     "IGUI_AutoDoor_ContextOpen": "Open Door",
     "IGUI_AutoDoor_ContextClose": "Close Door",
     "IGUI_AutoDoor_NoDoorInRange": "No paired auto door in range",
