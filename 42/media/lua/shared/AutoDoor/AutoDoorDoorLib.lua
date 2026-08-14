@@ -13,6 +13,13 @@
 AutoDoor = {}
 
 AutoDoor.ITEM_REMOTE = "Base.RemoteDoorOpener"
+-- The signal receiver + motor unit installed on the door. It needs a
+-- battery to operate: every open/close consumes charge, and the battery
+-- can be replaced from the door menu.
+AutoDoor.ITEM_MOTOR = "Base.AutoDoorMotor"
+AutoDoor.ITEM_BATTERY = "Base.Battery"
+AutoDoor.MOTOR_MAX_CHARGE = 100
+AutoDoor.MOTOR_CHARGE_PER_USE = 1
 AutoDoor.SEARCH_RADIUS = 12
 -- All vanilla fence gates live under this sprite prefix
 -- (fixtures_doors_fences_01_0 .. _131).
@@ -165,6 +172,18 @@ function AutoDoor.getRemote(player)
     return player:getInventory():getFirstTypeRecurse(AutoDoor.ITEM_REMOTE)
 end
 
+-- The signal receiver + motor unit (needed to install an opener).
+function AutoDoor.getMotor(player)
+    if not player then return nil end
+    return player:getInventory():getFirstTypeRecurse(AutoDoor.ITEM_MOTOR)
+end
+
+-- A battery to power the motor (needed to install and to replace).
+function AutoDoor.getBattery(player)
+    if not player then return nil end
+    return player:getInventory():getFirstTypeRecurse(AutoDoor.ITEM_BATTERY)
+end
+
 -- Give the remote a fresh unique id the first time it is paired.
 -- The item change is synced with the vanilla syncItemModData helper
 -- so it survives in multiplayer as well.
@@ -183,11 +202,10 @@ end
 -- Pairing / unpairing
 -- ------------------------------------------------------------
 
--- Install the opener on a door and pair it with a remote.
--- One remote can be paired with any number of doors; the door keeps
--- its original key (a locked door still needs its original key to be
--- unlocked automatically). The ModData change is transmitted with the
--- vanilla transmitModData helper.
+-- Install the opener on a door and pair it with a remote. The motor
+-- charge is only initialised on a fresh install (re-pairing with a
+-- different remote keeps the current charge). The ModData change is
+-- transmitted with the vanilla transmitModData helper.
 function AutoDoor.pairDoor(player, door, remote)
     if not door or not remote then return false end
     local id = AutoDoor.ensureRemoteId(player, remote)
@@ -196,9 +214,52 @@ function AutoDoor.pairDoor(player, door, remote)
         local md = part:getModData()
         md.autoDoor = true
         md.remoteKeyId = id
+        if md.motorCharge == nil then
+            md.motorCharge = AutoDoor.MOTOR_MAX_CHARGE
+        end
         part:transmitModData()
     end
     return true
+end
+
+-- ------------------------------------------------------------
+-- Motor battery
+-- ------------------------------------------------------------
+
+-- Current charge of the door's motor unit (0 = no power).
+function AutoDoor.getMotorCharge(door)
+    if not door then return 0 end
+    local md = door:getModData()
+    return md and md.motorCharge or 0
+end
+
+-- True when the motor has enough power to move the door.
+function AutoDoor.canOperate(door)
+    return AutoDoor.getMotorCharge(door) > 0
+end
+
+-- Consume power for one open/close operation.
+function AutoDoor.consumeMotorPower(door)
+    if not door then return end
+    local parts = AutoDoor.getDoorParts(door)
+    for _, part in ipairs(parts) do
+        local md = part:getModData()
+        if md and md.motorCharge ~= nil then
+            md.motorCharge = math.max(0, md.motorCharge - AutoDoor.MOTOR_CHARGE_PER_USE)
+            part:transmitModData()
+        end
+    end
+end
+
+-- Replace the battery: refill the motor to full charge.
+function AutoDoor.refillBattery(door)
+    if not door then return end
+    local parts = AutoDoor.getDoorParts(door)
+    for _, part in ipairs(parts) do
+        local md = part:getModData()
+        md.motorCharge = AutoDoor.MOTOR_MAX_CHARGE
+        part:transmitModData()
+    end
 end
 
 -- Remove the opener: the door goes back to a plain vanilla door.

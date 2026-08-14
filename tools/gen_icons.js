@@ -239,23 +239,50 @@ function drawPoster() {
   return c;
 }
 
+// ---------- auto door motor icon (128x128): receiver+motor box with
+// an antenna and a battery slot ----------
+function drawMotor(c) {
+  // body (dark electronics box)
+  fillRoundRect(c, 20, 28, 108, 104, 6, BODY_DARK);
+  fillRoundRect(c, 26, 34, 102, 98, 4, BODY);
+  // antenna
+  fillRect(c, 78, 6, 82, 30, PANEL_DARK);
+  fillCircle(c, 80, 10, 5, RED);
+  // receiver window / status screen
+  fillRoundRect(c, 34, 42, 94, 58, 3, SCREEN);
+  // battery slot (bottom)
+  fillRoundRect(c, 40, 70, 88, 88, 3, BODY_LIGHT);
+  fillRect(c, 46, 76, 82, 82, SCREEN);
+  fillRect(c, 46, 76, 52, 82, GREEN);
+  fillRect(c, 76, 76, 82, 82, GREEN);
+  // motor hint: small gear (simple circle + spokes)
+  fillCircle(c, 64, 96, 5, PANEL_DARK);
+  fillRect(c, 60, 90, 62, 102, PANEL_DARK);
+  fillRect(c, 66, 90, 68, 102, PANEL_DARK);
+}
+
 // ---------- main ----------
 const root = path.join(__dirname, "..");
+const texDir = path.join(root, "42", "media", "textures");
 
 const remoteIcon = canvas(128, 128);
 drawRemote(remoteIcon, 64, 64, 1);
-writePNG(remoteIcon, path.join(root, "media", "textures", "Item_RemoteDoorOpener.png"));
+writePNG(remoteIcon, path.join(texDir, "Item_RemoteDoorOpener.png"));
+
+const motorIcon = canvas(128, 128);
+drawMotor(motorIcon);
+writePNG(motorIcon, path.join(texDir, "Item_AutoDoorMotor.png"));
 
 const keyIcon = canvas(128, 128);
 drawKey(keyIcon);
-writePNG(keyIcon, path.join(root, "media", "textures", "Item_AutoDoorKey.png"));
+writePNG(keyIcon, path.join(texDir, "Item_AutoDoorKey.png"));
 
 const garageIcon = canvas(128, 128);
 drawGarageDoor(garageIcon);
-writePNG(garageIcon, path.join(root, "media", "textures", "Item_AutoGarageDoor.png"));
+writePNG(garageIcon, path.join(texDir, "Item_AutoGarageDoor.png"));
 
 const fenceIcon = canvas(128, 128);
 drawFenceGate(fenceIcon);
-writePNG(fenceIcon, path.join(root, "media", "textures", "Item_AutoFenceGate.png"));
+writePNG(fenceIcon, path.join(texDir, "Item_AutoFenceGate.png"));
 
 writePNG(drawPoster(), path.join(root, "poster.png"));

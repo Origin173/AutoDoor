@@ -12,6 +12,19 @@ module Base
         Tooltip = Tooltip_RemoteDoorOpener,
     }
 
+    item AutoDoorMotor
+    {
+        DisplayCategory = Electronics,
+        ItemType = base:normal,
+        Weight = 1.5,
+        Icon = AutoDoorMotor,
+        DisplayName = AutoDoorMotor,
+        WorldStaticModel = RadioReceiver_Ground,
+        MetalValue = 7.0,
+        Tags = base:hasmetal,
+        Tooltip = Tooltip_AutoDoorMotor,
+    }
+
     item AutoDoorKey
     {
         DisplayCategory = Security,

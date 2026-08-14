@@ -37,8 +37,16 @@ function AutoDoorRemote.trigger(player)
         return false
     end
 
+    -- The signal receiver + motor unit needs battery power to move the
+    -- door; without power the remote just clicks.
+    if not AutoDoor.canOperate(door) then
+        player:getEmitter():playSound("RadioButton")
+        return false
+    end
+
     local ok = AutoDoor.toggleDoor(player, door)
     if ok then
+        AutoDoor.consumeMotorPower(door)
         getSoundManager():playUISound("UIActivateButton")
     end
     return ok
@@ -84,7 +92,14 @@ function AutoDoorRemote.onContextToggle(playerNum, door)
         player:getEmitter():playSound("DoorIsLocked")
         return
     end
-    AutoDoor.toggleDoor(player, door)
+    -- The motor needs battery power to move the door.
+    if not AutoDoor.canOperate(door) then
+        player:getEmitter():playSound("RadioButton")
+        return
+    end
+    if AutoDoor.toggleDoor(player, door) then
+        AutoDoor.consumeMotorPower(door)
+    end
 end
 
 Events.OnFillInventoryObjectContextMenu.Add(AutoDoorRemote.fillInventoryMenu)

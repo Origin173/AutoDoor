@@ -1,10 +1,11 @@
 --[[
     AutoDoor install menu (client).
-    Right-click a vanilla garage door or fence gate:
-      - not automated : "Install Auto Door Opener" — pairs the door with
-        a remote control from your inventory (greyed out without one).
+    Right-click a vanilla garage door, fence gate or player-built door:
+      - not automated : "Install Auto Door Opener" — installs the signal
+        receiver + motor unit (consumes one motor item and one battery)
+        and pairs it with a remote control from your inventory.
       - automated     : "Auto Door Opener" submenu with re-pair with a
-        different remote / remove the opener.
+        different remote / replace battery / remove the opener.
     The door itself is never replaced: it keeps its original look, size,
     sprites and native open/close animation.
 ]]
@@ -24,7 +25,24 @@ function AutoDoorInstallMenu.findDoor(worldobjects)
     return nil
 end
 
+-- Fresh install: consumes one motor unit and one battery (the motor's
+-- first battery), then pairs the door with the remote.
 function AutoDoorInstallMenu.onInstall(playerNum, door)
+    local player = getSpecificPlayer(playerNum)
+    if not player then return end
+    local remote = AutoDoor.getRemote(player)
+    local motor = AutoDoor.getMotor(player)
+    local battery = AutoDoor.getBattery(player)
+    if not remote or not motor or not battery then return end
+    if AutoDoor.pairDoor(player, door, remote) then
+        motor:getContainer():Remove(motor)
+        battery:getContainer():Remove(battery)
+        getSoundManager():playUISound("UIActivateButton")
+    end
+end
+
+-- Re-pair an automated door with a different remote (no motor needed).
+function AutoDoorInstallMenu.onRePair(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
     local remote = AutoDoor.getRemote(player)
@@ -32,6 +50,17 @@ function AutoDoorInstallMenu.onInstall(playerNum, door)
     if AutoDoor.pairDoor(player, door, remote) then
         getSoundManager():playUISound("UIActivateButton")
     end
+end
+
+-- Replace the motor's battery (consumes one Battery item).
+function AutoDoorInstallMenu.onReplaceBattery(playerNum, door)
+    local player = getSpecificPlayer(playerNum)
+    if not player then return end
+    local battery = AutoDoor.getBattery(player)
+    if not battery then return end
+    battery:getContainer():Remove(battery)
+    AutoDoor.refillBattery(door)
+    getSoundManager():playUISound("UIActivateButton")
 end
 
 function AutoDoorInstallMenu.onUnpair(playerNum, door)
@@ -43,22 +72,41 @@ local function hasRemote(playerObj)
     return AutoDoor.getRemote(playerObj) ~= nil
 end
 
-local function remoteTooltip(playerObj)
-    if hasRemote(playerObj) then return nil end
+local function hasBattery(playerObj)
+    return AutoDoor.getBattery(playerObj) ~= nil
+end
+
+-- Everything a fresh install needs: remote + motor + battery.
+local function hasInstallItems(playerObj)
+    return hasRemote(playerObj)
+        and AutoDoor.getMotor(playerObj) ~= nil
+        and hasBattery(playerObj)
+end
+
+local function makeTooltip(playerObj, key, fallback)
     local tooltip = ISToolTip:new(playerObj)
     tooltip:initialise()
-    tooltip:setName(AutoDoor.text("IGUI_AutoDoor_NeedRemote", "A remote control is required in your inventory"))
+    tooltip:setName(AutoDoor.text(key, fallback))
     -- description stays at its default "" (empty string): an empty TABLE
     -- would crash the tooltip renderer (ISToolTip.layoutContents only
     -- guards against "").
     return tooltip
 end
 
+local function installTooltip(playerObj)
+    if hasInstallItems(playerObj) then return nil end
+    return makeTooltip(playerObj, "IGUI_AutoDoor_NeedItems",
+        "Requires in inventory: a remote, an auto door motor and a battery")
+end
+
+local function batteryTooltip(playerObj)
+    if hasBattery(playerObj) then return nil end
+    return makeTooltip(playerObj, "IGUI_AutoDoor_NeedBattery", "A battery is required in your inventory")
+end
+
 local function lockedTooltip(playerObj)
-    local tooltip = ISToolTip:new(playerObj)
-    tooltip:initialise()
-    tooltip:setName(AutoDoor.text("IGUI_AutoDoor_CannotInstallLocked", "Cannot install on a locked door (unlock it first)"))
-    return tooltip
+    return makeTooltip(playerObj, "IGUI_AutoDoor_CannotInstallLocked",
+        "Cannot install on a locked door (unlock it first)")
 end
 
 -- The opener can only be installed on an unlocked door: the remote
@@ -68,11 +116,14 @@ local function canInstallOn(door)
 end
 
 -- Debug helper (only visible with the -debug launch option):
--- spawns a remote already paired with this door, skipping the recipe.
+-- installs the opener (motor + battery consumed) and hands the player
+-- the already-paired remote, skipping the recipe.
 function AutoDoorInstallMenu.onDebugSpawnRemote(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
     local remote = instanceItem(AutoDoor.ITEM_REMOTE)
+    local motor = instanceItem(AutoDoor.ITEM_MOTOR)
+    local battery = instanceItem(AutoDoor.ITEM_BATTERY)
     if AutoDoor.pairDoor(player, door, remote) then
         player:getInventory():AddItem(remote)
         getSoundManager():playUISound("UIActivateButton")
@@ -117,19 +168,27 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
         local subMenu = ISContextMenu:getNew(menu)
         menu:addSubMenu(menu:addOption(AutoDoor.text("IGUI_AutoDoor_Manage", "Auto Door Opener")), subMenu)
         local rePair = subMenu:addOption(AutoDoor.text("IGUI_AutoDoor_RepairPair", "Re-pair With Remote"), playerNum,
-            AutoDoorInstallMenu.onInstall, door)
-        rePair.toolTip = remoteTooltip(player)
+            AutoDoorInstallMenu.onRePair, door)
         if not hasRemote(player) then
             rePair.notAvailable = true
             rePair.onSelect = nil
+            rePair.toolTip = makeTooltip(player, "IGUI_AutoDoor_NeedRemote",
+                "A remote control is required in your inventory")
+        end
+        local battery = subMenu:addOption(AutoDoor.text("IGUI_AutoDoor_ReplaceBattery", "Replace Battery"), playerNum,
+            AutoDoorInstallMenu.onReplaceBattery, door)
+        battery.toolTip = batteryTooltip(player)
+        if not hasBattery(player) then
+            battery.notAvailable = true
+            battery.onSelect = nil
         end
         subMenu:addOption(AutoDoor.text("IGUI_AutoDoor_Uninstall", "Remove Auto Door Opener"), playerNum,
             AutoDoorInstallMenu.onUnpair, door)
     else
         local install = menu:addOption(AutoDoor.text("IGUI_AutoDoor_Install", "Install Auto Door Opener"), playerNum,
             AutoDoorInstallMenu.onInstall, door)
-        install.toolTip = remoteTooltip(player)
-        if not hasRemote(player) then
+        install.toolTip = installTooltip(player)
+        if not hasInstallItems(player) then
             install.notAvailable = true
             install.onSelect = nil
         elseif not canInstallOn(door) then

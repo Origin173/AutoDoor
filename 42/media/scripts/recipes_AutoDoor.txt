@@ -20,4 +20,27 @@ module Base
 			item 1 Base.RemoteDoorOpener,
 		}
 	}
+
+	craftRecipe CraftAutoDoorMotor
+	{
+		timedAction = MakingElectrical,
+		time = 150,
+		NeedToBeLearn = false,
+		SkillRequired = Electricity:2,
+		Tags = AnySurfaceCraft,
+		category = Electrical,
+		xpAward = Electricity:10,
+		inputs
+		{
+			item 3 [Base.ElectronicsScrap] flags[NoBrokenItems],
+			item 2 [Base.ElectricWire] flags[NoBrokenItems],
+			item 2 [Base.Screws] flags[NoBrokenItems],
+			item 1 [Base.RadioReceiver] flags[NoBrokenItems],
+			item 1 tags[base:screwdriver] mode:keep flags[NoBrokenItems],
+		}
+		outputs
+		{
+			item 1 Base.AutoDoorMotor,
+		}
+	}
 }

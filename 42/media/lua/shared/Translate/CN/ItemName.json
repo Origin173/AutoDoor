@@ -1,4 +1,5 @@
 {
     "Base.RemoteDoorOpener": "自动门遥控器",
+    "Base.AutoDoorMotor": "自动门电机",
     "Base.AutoDoorKey": "自动门钥匙"
 }
