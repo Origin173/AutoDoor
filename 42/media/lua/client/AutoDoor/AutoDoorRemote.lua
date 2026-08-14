@@ -1,24 +1,15 @@
---[[
-    AutoDoor remote control logic (client).
-    Finds the paired auto door near the player (or their vehicle) and
-    toggles it open/closed. The remote only simplifies the open/close
-    action: it does NOT bypass locks - a locked door refuses to open
-    (vanilla behaviour). Works from the driver's seat: the search is
-    centred on the vehicle square.
-]]
-
+-- Client remote logic: toggles paired doors near the player or their vehicle.
 require "AutoDoor/AutoDoorDoorLib"
 
 AutoDoorRemote = {}
 
--- Execute one "use the remote" action. Returns true when a door was toggled.
+-- Returns true when a door was toggled.
 function AutoDoorRemote.trigger(player)
     if not player then return false end
     local remote = AutoDoor.getRemote(player)
     if not remote then return false end
     local remoteId = AutoDoor.getRemoteId(remote)
     if not remoteId then
-        -- Remote never paired with any door yet.
         player:getEmitter():playSound("RadioButton")
         return false
     end
@@ -30,15 +21,13 @@ function AutoDoorRemote.trigger(player)
     local door = AutoDoor.getNearestDoor(player, doors)
     if not door then return false end
 
-    -- Locked doors stay locked: the remote only simplifies opening/
-    -- closing, it does not unlock.
+    -- Locked doors refuse to open; the remote automates open/close only.
     if door:isLockedByKey() then
         player:getEmitter():playSound("DoorIsLocked")
         return false
     end
 
-    -- The signal receiver + motor unit needs battery power to move the
-    -- door; without power the remote just clicks.
+    -- The motor needs battery power to move the door.
     if not AutoDoor.canOperate(door) then
         player:getEmitter():playSound("RadioButton")
         return false
@@ -55,8 +44,7 @@ end
 -- Right-click menu on the remote item (works on foot too).
 function AutoDoorRemote.fillInventoryMenu(playerNum, context, items)
     if not items then return end
-    -- items can contain InventoryItem objects or inventory "group" objects
-    -- (which carry an .items list); find the first real item.
+    -- items may hold inventory group objects (with an .items list)
     local remote = nil
     for _, it in ipairs(items) do
         if instanceof(it, "InventoryItem") then
@@ -87,12 +75,10 @@ end
 function AutoDoorRemote.onContextToggle(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
-    -- The remote only simplifies open/close: locked doors refuse to open.
     if door:isLockedByKey() then
         player:getEmitter():playSound("DoorIsLocked")
         return
     end
-    -- The motor needs battery power to move the door.
     if not AutoDoor.canOperate(door) then
         player:getEmitter():playSound("RadioButton")
         return

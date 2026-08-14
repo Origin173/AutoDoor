@@ -1,20 +1,8 @@
---[[
-    AutoDoor install menu (client).
-    Right-click a vanilla garage door, fence gate or player-built door:
-      - not automated : "Install Auto Door Opener" — installs the signal
-        receiver + motor unit (consumes one motor item and one battery)
-        and pairs it with a remote control from your inventory.
-      - automated     : "Auto Door Opener" submenu with re-pair with a
-        different remote / replace battery / remove the opener.
-    The door itself is never replaced: it keeps its original look, size,
-    sprites and native open/close animation.
-]]
-
+-- Client door context menu: install, re-pair, replace battery, uninstall.
 require "AutoDoor/AutoDoorDoorLib"
 
 AutoDoorInstallMenu = {}
 
--- First automatable door among the clicked objects.
 function AutoDoorInstallMenu.findDoor(worldobjects)
     if not worldobjects then return nil end
     for _, obj in ipairs(worldobjects) do
@@ -25,8 +13,7 @@ function AutoDoorInstallMenu.findDoor(worldobjects)
     return nil
 end
 
--- Fresh install: consumes one motor unit and one battery (the motor's
--- first battery), then pairs the door with the remote.
+-- Fresh install consumes one motor unit and one battery (its first battery).
 function AutoDoorInstallMenu.onInstall(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
@@ -41,7 +28,7 @@ function AutoDoorInstallMenu.onInstall(playerNum, door)
     end
 end
 
--- Re-pair an automated door with a different remote (no motor needed).
+-- Re-pairs the door with a different remote (no motor needed).
 function AutoDoorInstallMenu.onRePair(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
@@ -52,7 +39,7 @@ function AutoDoorInstallMenu.onRePair(playerNum, door)
     end
 end
 
--- Replace the motor's battery (consumes one Battery item).
+-- Consumes one battery and refills the motor to full charge.
 function AutoDoorInstallMenu.onReplaceBattery(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
@@ -76,7 +63,6 @@ local function hasBattery(playerObj)
     return AutoDoor.getBattery(playerObj) ~= nil
 end
 
--- Everything a fresh install needs: remote + motor + battery.
 local function hasInstallItems(playerObj)
     return hasRemote(playerObj)
         and AutoDoor.getMotor(playerObj) ~= nil
@@ -87,9 +73,7 @@ local function makeTooltip(playerObj, key, fallback)
     local tooltip = ISToolTip:new(playerObj)
     tooltip:initialise()
     tooltip:setName(AutoDoor.text(key, fallback))
-    -- description stays at its default "" (empty string): an empty TABLE
-    -- would crash the tooltip renderer (ISToolTip.layoutContents only
-    -- guards against "").
+    -- description must stay "" (an empty table crashes the tooltip renderer)
     return tooltip
 end
 
@@ -109,15 +93,12 @@ local function lockedTooltip(playerObj)
         "Cannot install on a locked door (unlock it first)")
 end
 
--- The opener can only be installed on an unlocked door: the remote
--- simply automates the open/close action and never bypasses locks.
+-- The remote never bypasses locks, so only unlocked doors can be paired.
 local function canInstallOn(door)
     return not door:isLockedByKey()
 end
 
--- Debug helper (only visible with the -debug launch option):
--- installs the opener (motor + battery consumed) and hands the player
--- the already-paired remote plus the magazine, skipping the recipe.
+-- Debug only: skips the recipe and hands out an already-paired remote.
 function AutoDoorInstallMenu.onDebugSpawnRemote(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
@@ -134,9 +115,7 @@ function AutoDoorInstallMenu.onDebugSpawnRemote(playerNum, door)
     end
 end
 
--- The vanilla "Door" submenu (with Open/Lock) is created by the engine
--- before OnFillWorldObjectContextMenu fires. Find it so our options sit
--- right next to "Open Door", inside 门 > . Falls back to nil (top level).
+-- Our options go inside the vanilla "Door" submenu when it exists.
 function AutoDoorInstallMenu.findDoorSubMenu(context)
     if not context or not context.options then return nil end
     local doorTitles = {
@@ -162,13 +141,10 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
     local player = getSpecificPlayer(playerNum)
     if not player or player:isDead() then return end
 
-    -- Our options go inside the vanilla "Door" submenu, next to
-    -- Open/Lock; fall back to the top level if it is not there.
     local menu = AutoDoorInstallMenu.findDoorSubMenu(context) or context
 
     local md = door:getModData()
     if md.autoDoor then
-        -- Already automated: manage submenu.
         local subMenu = ISContextMenu:getNew(menu)
         menu:addSubMenu(menu:addOption(AutoDoor.text("IGUI_AutoDoor_Manage", "Auto Door Opener")), subMenu)
         local rePair = subMenu:addOption(AutoDoor.text("IGUI_AutoDoor_RepairPair", "Re-pair With Remote"), playerNum,
@@ -196,14 +172,12 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
             install.notAvailable = true
             install.onSelect = nil
         elseif not canInstallOn(door) then
-            -- Locked doors cannot be paired: the remote never bypasses locks.
             install.notAvailable = true
             install.onSelect = nil
             install.toolTip = lockedTooltip(player)
         end
     end
 
-    -- Debug mode only: one-click paired remote for testing.
     local debugOn = false
     if isDebugEnabled then
         local ok, res = pcall(isDebugEnabled)

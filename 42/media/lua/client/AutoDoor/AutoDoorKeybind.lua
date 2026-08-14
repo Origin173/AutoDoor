@@ -1,17 +1,9 @@
---[[
-    AutoDoor keybinding registration (client).
-    B42 removed ISKeyBindings; mods register entries in the global keyBinding
-    table so the binding shows up in Options > Keybindings and can be rebound
-    (persisted in keysB42.ini). Default key: K (unused by vanilla).
-    Events.OnKeyStartPressed fires on key-down (edge trigger).
-]]
-
+-- B42 keybind: entries in the global keyBinding table show up in Options > Key Bindings (default K).
 require "AutoDoor/AutoDoorRemote"
 
 local BIND_CATEGORY = "[AutoDoor]"
 local BIND_NAME = "Open Door With Remote"
 
--- Register the rebindable key once (appears in Options > Key Bindings).
 local function registerKeyBind()
     if not keyBinding then return end
     for _, kb in ipairs(keyBinding) do
@@ -24,7 +16,7 @@ end
 local function onKeyStartPressed(key)
     if not getCore():isKey(BIND_NAME, key) then return end
     if not getPlayer() or getPlayer():isDead() then return end
-    -- Ignore while typing in a text field or with a UI grabbing the key.
+    -- Ignore while typing or when a UI consumes the key.
     if UIManager.getSpeedControls() and UIManager.getSpeedControls():isKeyConsumed(key) then
         return
     end

@@ -1,9 +1,4 @@
---[[
-    AutoDoor loot distribution (server).
-    Adds the Auto Door Magazine to mailboxes so the recipes can be
-    learned from reading it.
-]]
-
+-- Server: spawns the magazine in mailboxes so the recipes can be learned.
 local function addToContainer(containerName, item, weight)
     if not ProceduralDistributions or not ProceduralDistributions.list then return end
     local dist = ProceduralDistributions.list[containerName]

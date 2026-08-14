@@ -1,36 +1,16 @@
---[[
-    AutoDoor shared library.
-    Door helpers used by the client-side install menu and the remote
-    control logic. Only relies on native APIs so it can be loaded on
-    every side (shared).
-
-    Design: the mod never replaces door objects. A vanilla garage door
-    or fence gate keeps its original object, sprites, size and native
-    open/close animation. "Installing" only tags the door with ModData
-    (autoDoor + remoteKeyId) and pairs it with a remote control id.
-]]
-
+-- Shared door helpers (detection, pairing, motor power). Loaded on every side.
 AutoDoor = {}
 
 AutoDoor.ITEM_REMOTE = "Base.RemoteDoorOpener"
--- The signal receiver + motor unit installed on the door. It needs a
--- battery to operate: every open/close consumes charge, and the battery
--- can be replaced from the door menu.
-AutoDoor.ITEM_MOTOR = "Base.AutoDoorMotor"
+AutoDoor.ITEM_MOTOR = "Base.AutoDoorMotor" -- receiver + motor unit installed on the door
 AutoDoor.ITEM_BATTERY = "Base.Battery"
--- The magazine that teaches the crafting recipes when read.
-AutoDoor.ITEM_MAGAZINE = "Base.AutoDoorMagazine"
+AutoDoor.ITEM_MAGAZINE = "Base.AutoDoorMagazine" -- reading it unlocks the recipes
 AutoDoor.MOTOR_MAX_CHARGE = 100
 AutoDoor.MOTOR_CHARGE_PER_USE = 0.5
 AutoDoor.SEARCH_RADIUS = 12
--- All vanilla fence gates live under this sprite prefix
--- (fixtures_doors_fences_01_0 .. _131).
-AutoDoor.FENCE_GATE_PREFIX = "fixtures_doors_fences_01_"
+AutoDoor.FENCE_GATE_PREFIX = "fixtures_doors_fences_01_" -- all vanilla fence gates share this sprite prefix
 
--- Translation lookup with a hard fallback. Some setups (e.g. third-party
--- translation mods) return nil for keys that are not loaded; a nil text
--- given to a tooltip/menu option crashes the tooltip renderer and spams
--- the log with errors, so never let nil through.
+-- getText fallback; a nil text would crash tooltip/menu rendering.
 function AutoDoor.text(key, fallback)
     local t = getText(key)
     if t == nil or t == "" or t == key then
@@ -39,21 +19,14 @@ function AutoDoor.text(key, fallback)
     return t
 end
 
--- ------------------------------------------------------------
--- Door type detection (vanilla doors only)
--- ------------------------------------------------------------
-
--- Garage doors carry the "GarageDoor" tile property (1..6:
--- closed left/middle/right + open variants). This is the same check
--- vanilla itself uses (ISZoneDisplay.lua).
+-- Vanilla garage doors carry the "GarageDoor" tile property.
 function AutoDoor.isGarageDoor(object)
     if not instanceof(object, "IsoDoor") then return false end
     local props = object:getProperties()
     return props ~= nil and props:has("GarageDoor")
 end
 
--- Fence gates are IsoDoors whose sprite belongs to the
--- fixtures_doors_fences_01_ tileset (single gates and double gates).
+-- Fence gates are IsoDoors using the fixtures_doors_fences_01_ tileset.
 function AutoDoor.isFenceGate(object)
     if not instanceof(object, "IsoDoor") then return false end
     local sprite = object:getSprite()
@@ -67,9 +40,7 @@ function AutoDoor.isAutomatableDoor(object)
         or AutoDoor.isBuiltDoor(object)
 end
 
--- Doors built by the player (carpentry / metalworking) are IsoThumpable
--- doors carrying the build-material ModData ("need:...") written by
--- buildUtil.setInfo. Worldgen doors never have that marker.
+-- Player-built doors (IsoThumpable) carry "need:" build markers in ModData.
 function AutoDoor.isBuiltDoor(object)
     if not instanceof(object, "IsoThumpable") then return false end
     if not object:isDoor() then return false end
@@ -83,7 +54,6 @@ function AutoDoor.isBuiltDoor(object)
     return false
 end
 
--- True when the door has been automated by this mod.
 function AutoDoor.isAutoDoor(object)
     if not (instanceof(object, "IsoDoor") or instanceof(object, "IsoThumpable")) then
         return false
@@ -92,16 +62,7 @@ function AutoDoor.isAutoDoor(object)
     return md ~= nil and (md.autoDoor == true or md.remoteKeyId ~= nil)
 end
 
--- ------------------------------------------------------------
--- Door units / chains
--- ------------------------------------------------------------
-
--- All parts of one door unit, native chain handling:
---   - garage doors: IsoDoor.getGarageDoorPrev/Next
---   - double doors: IsoDoor.getDoubleDoorObject (slots 1..4)
--- A regular door is its own unit.
--- Note: world objects expose no ID method in the Lua API, so parts are
--- deduplicated by square position + facing + sprite name.
+-- Parts of one door unit, deduped by position + facing + sprite (world objects expose no ID API in Lua).
 function AutoDoor.getDoorParts(door)
     local parts = {}
     local seen = {}
@@ -122,6 +83,7 @@ function AutoDoor.getDoorParts(door)
     end
     if not door then return parts end
     add(door)
+    -- Walk the whole garage unit via prev/next.
     if AutoDoor.isGarageDoor(door) and IsoDoor.getGarageDoorIndex(door) ~= -1 then
         local cur = door
         local prev = IsoDoor.getGarageDoorPrev(cur)
@@ -134,8 +96,7 @@ function AutoDoor.getDoorParts(door)
             cur = IsoDoor.getGarageDoorNext(cur)
         end
     end
-    -- Double-door chains are only linked natively for IsoDoor objects;
-    -- built (IsoThumpable) double doors toggle per part.
+    -- Double-door chains are linked natively for IsoDoor only; built doors toggle per part.
     if instanceof(door, "IsoDoor") then
         for i = 1, 4 do
             add(IsoDoor.getDoubleDoorObject(door, i))
@@ -150,12 +111,7 @@ function AutoDoor.getDoorAnchor(door)
     return parts[1] or door
 end
 
--- ------------------------------------------------------------
--- Remote identity
--- ------------------------------------------------------------
-
--- The pairing id of a remote, stored in its ModData (set on first
--- pairing).
+-- Pairing id stored on the remote's ModData.
 function AutoDoor.getRemoteId(remote)
     if not remote then return nil end
     local id = remote:getModData().autoDoorRemoteId
@@ -163,28 +119,22 @@ function AutoDoor.getRemoteId(remote)
     return nil
 end
 
--- The first remote control in the player's inventory (anywhere,
--- including containers inside the inventory).
 function AutoDoor.getRemote(player)
     if not player then return nil end
     return player:getInventory():getFirstTypeRecurse(AutoDoor.ITEM_REMOTE)
 end
 
--- The signal receiver + motor unit (needed to install an opener).
 function AutoDoor.getMotor(player)
     if not player then return nil end
     return player:getInventory():getFirstTypeRecurse(AutoDoor.ITEM_MOTOR)
 end
 
--- A battery to power the motor (needed to install and to replace).
 function AutoDoor.getBattery(player)
     if not player then return nil end
     return player:getInventory():getFirstTypeRecurse(AutoDoor.ITEM_BATTERY)
 end
 
--- Give the remote a fresh unique id the first time it is paired.
--- The item change is synced with the vanilla syncItemModData helper
--- so it survives in multiplayer as well.
+-- First pairing assigns a random id, synced so MP clients agree.
 function AutoDoor.ensureRemoteId(player, remote)
     local id = AutoDoor.getRemoteId(remote)
     if id then return id end
@@ -196,14 +146,7 @@ function AutoDoor.ensureRemoteId(player, remote)
     return id
 end
 
--- ------------------------------------------------------------
--- Pairing / unpairing
--- ------------------------------------------------------------
-
--- Install the opener on a door and pair it with a remote. The motor
--- charge is only initialised on a fresh install (re-pairing with a
--- different remote keeps the current charge). The ModData change is
--- transmitted with the vanilla transmitModData helper.
+-- Motor charge is only set on a fresh install; re-pairing keeps the current charge.
 function AutoDoor.pairDoor(player, door, remote)
     if not door or not remote then return false end
     local id = AutoDoor.ensureRemoteId(player, remote)
@@ -220,23 +163,16 @@ function AutoDoor.pairDoor(player, door, remote)
     return true
 end
 
--- ------------------------------------------------------------
--- Motor battery
--- ------------------------------------------------------------
-
--- Current charge of the door's motor unit (0 = no power).
 function AutoDoor.getMotorCharge(door)
     if not door then return 0 end
     local md = door:getModData()
     return md and md.motorCharge or 0
 end
 
--- True when the motor has enough power to move the door.
 function AutoDoor.canOperate(door)
     return AutoDoor.getMotorCharge(door) > 0
 end
 
--- Consume power for one open/close operation.
 function AutoDoor.consumeMotorPower(door)
     if not door then return end
     local parts = AutoDoor.getDoorParts(door)
@@ -249,7 +185,7 @@ function AutoDoor.consumeMotorPower(door)
     end
 end
 
--- Replace the battery: refill the motor to full charge.
+-- Replaces the battery: refills the motor to full charge.
 function AutoDoor.refillBattery(door)
     if not door then return end
     local parts = AutoDoor.getDoorParts(door)
@@ -260,7 +196,7 @@ function AutoDoor.refillBattery(door)
     end
 end
 
--- Remove the opener: the door goes back to a plain vanilla door.
+-- Removes the opener; the door becomes a plain vanilla door again.
 function AutoDoor.unpairDoor(door)
     if not door then return end
     local parts = AutoDoor.getDoorParts(door)
@@ -272,7 +208,6 @@ function AutoDoor.unpairDoor(door)
     end
 end
 
--- True when the door is paired with the given remote id.
 function AutoDoor.doorMatchesRemote(door, remoteId)
     if not remoteId then return false end
     local md = door:getModData()
@@ -280,12 +215,7 @@ function AutoDoor.doorMatchesRemote(door, remoteId)
     return md.remoteKeyId == remoteId
 end
 
--- ------------------------------------------------------------
--- Remote control
--- ------------------------------------------------------------
-
--- Unlock every part of a door unit (mirrors the vanilla ISLockDoor
--- sync pattern).
+-- Unlocks every part of a door unit.
 function AutoDoor.unlockDoor(door)
     local parts = AutoDoor.getDoorParts(door)
     for _, part in ipairs(parts) do
@@ -296,8 +226,7 @@ function AutoDoor.unlockDoor(door)
     end
 end
 
--- Toggle a door open/closed. Chains are toggled through their anchor
--- part; the native code animates and syncs the whole unit.
+-- Toggles through the anchor part so the whole chain animates as one unit.
 function AutoDoor.toggleDoor(player, door)
     if not door then return false end
     if door:isDestroyed() then return false end
@@ -307,8 +236,7 @@ function AutoDoor.toggleDoor(player, door)
     return true
 end
 
--- Square used as the search origin: the vehicle square while seated,
--- otherwise the player square.
+-- Search origin: the vehicle square while seated, otherwise the player square.
 function AutoDoor.getAnchorSquare(player)
     local vehicle = player:getVehicle()
     if vehicle then
@@ -318,8 +246,7 @@ function AutoDoor.getAnchorSquare(player)
     return player:getCurrentSquare()
 end
 
--- Find auto doors paired with the given remote id within radius of the
--- anchor square (the vehicle position while the player is seated).
+-- Doors paired with the remote id within radius of the anchor square.
 function AutoDoor.findPairedDoors(player, remoteId, radius)
     local doors = {}
     local anchor = AutoDoor.getAnchorSquare(player)
@@ -343,7 +270,6 @@ function AutoDoor.findPairedDoors(player, remoteId, radius)
     return doors
 end
 
--- Nearest door in the list.
 function AutoDoor.getNearestDoor(player, doors)
     local best, bestDist = nil, nil
     for _, door in ipairs(doors) do
