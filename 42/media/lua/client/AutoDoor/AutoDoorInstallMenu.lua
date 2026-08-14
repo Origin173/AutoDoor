@@ -117,15 +117,19 @@ end
 
 -- Debug helper (only visible with the -debug launch option):
 -- installs the opener (motor + battery consumed) and hands the player
--- the already-paired remote, skipping the recipe.
+-- the already-paired remote plus the magazine, skipping the recipe.
 function AutoDoorInstallMenu.onDebugSpawnRemote(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
     local remote = instanceItem(AutoDoor.ITEM_REMOTE)
     local motor = instanceItem(AutoDoor.ITEM_MOTOR)
     local battery = instanceItem(AutoDoor.ITEM_BATTERY)
+    local magazine = instanceItem(AutoDoor.ITEM_MAGAZINE)
     if AutoDoor.pairDoor(player, door, remote) then
         player:getInventory():AddItem(remote)
+        if magazine then
+            player:getInventory():AddItem(magazine)
+        end
         getSoundManager():playUISound("UIActivateButton")
     end
 end

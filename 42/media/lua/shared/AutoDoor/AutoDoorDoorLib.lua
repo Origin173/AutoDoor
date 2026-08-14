@@ -18,8 +18,10 @@ AutoDoor.ITEM_REMOTE = "Base.RemoteDoorOpener"
 -- can be replaced from the door menu.
 AutoDoor.ITEM_MOTOR = "Base.AutoDoorMotor"
 AutoDoor.ITEM_BATTERY = "Base.Battery"
+-- The magazine that teaches the crafting recipes when read.
+AutoDoor.ITEM_MAGAZINE = "Base.AutoDoorMagazine"
 AutoDoor.MOTOR_MAX_CHARGE = 100
-AutoDoor.MOTOR_CHARGE_PER_USE = 1
+AutoDoor.MOTOR_CHARGE_PER_USE = 0.5
 AutoDoor.SEARCH_RADIUS = 12
 -- All vanilla fence gates live under this sprite prefix
 -- (fixtures_doors_fences_01_0 .. _131).

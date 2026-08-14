@@ -1,5 +1,6 @@
 {
     "Base.RemoteDoorOpener": "Auto Door Remote",
     "Base.AutoDoorMotor": "Auto Door Motor",
+    "Base.AutoDoorMagazine": "Auto Door Magazine",
     "Base.AutoDoorKey": "Auto Door Key"
 }

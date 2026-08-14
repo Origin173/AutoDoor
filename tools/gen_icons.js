@@ -261,6 +261,29 @@ function drawMotor(c) {
   fillRect(c, 66, 90, 68, 102, PANEL_DARK);
 }
 
+// ---------- auto door magazine icon (128x128): a magazine/book with a
+// small remote drawing on the cover ----------
+function drawMagazine(c) {
+  // cover
+  fillRoundRect(c, 24, 16, 104, 112, 4, [40, 44, 52, 255]);
+  // spine highlight
+  fillRect(c, 28, 20, 32, 108, [64, 70, 80, 255]);
+  // title bar
+  fillRect(c, 40, 26, 96, 36, PANEL_DARK);
+  // title text hint (3 dashes)
+  fillRect(c, 44, 30, 92, 32, BODY_DARK);
+  // small remote drawing on the cover
+  drawRemote(c, 64, 74, 0.55);
+  // signal waves
+  const waveCol = [120, 124, 132, 255];
+  for (const [cx, cy, r] of [[64, 60, 6], [64, 60, 10]]) {
+    for (let a = -50; a <= 50; a++) {
+      const rad = (a * Math.PI) / 180;
+      setPx(c, Math.round(cx + r * Math.cos(rad)), Math.round(cy - r * Math.sin(rad)), waveCol[0], waveCol[1], waveCol[2], 255);
+    }
+  }
+}
+
 // ---------- main ----------
 const root = path.join(__dirname, "..");
 const texDir = path.join(root, "42", "media", "textures");
@@ -272,6 +295,10 @@ writePNG(remoteIcon, path.join(texDir, "Item_RemoteDoorOpener.png"));
 const motorIcon = canvas(128, 128);
 drawMotor(motorIcon);
 writePNG(motorIcon, path.join(texDir, "Item_AutoDoorMotor.png"));
+
+const magazineIcon = canvas(128, 128);
+drawMagazine(magazineIcon);
+writePNG(magazineIcon, path.join(texDir, "Item_AutoDoorMagazine.png"));
 
 const keyIcon = canvas(128, 128);
 drawKey(keyIcon);

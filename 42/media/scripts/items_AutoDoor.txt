@@ -25,6 +25,20 @@ module Base
         Tooltip = Tooltip_AutoDoorMotor,
     }
 
+    item AutoDoorMagazine
+    {
+        DisplayCategory = RecipeResource,
+        ItemType = base:literature,
+        Weight = 0.5,
+        Icon = AutoDoorMagazine,
+        BoredomChange = -20,
+        StressChange = -15,
+        LearnedRecipes = CraftAutoDoorRemote;CraftAutoDoorMotor,
+        StaticModel = Magazine,
+        WorldStaticModel = MagazineGround,
+        Tags = base:magazine,
+    }
+
     item AutoDoorKey
     {
         DisplayCategory = Security,

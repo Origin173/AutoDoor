@@ -4,7 +4,7 @@ module Base
 	{
 		timedAction = MakingElectrical,
 		time = 90,
-		NeedToBeLearn = false,
+		NeedToBeLearn = true,
 		SkillRequired = Electricity:1,
 		Tags = AnySurfaceCraft,
 		category = Electrical,
@@ -25,8 +25,8 @@ module Base
 	{
 		timedAction = MakingElectrical,
 		time = 150,
-		NeedToBeLearn = false,
-		SkillRequired = Electricity:2,
+		NeedToBeLearn = true,
+		SkillRequired = Electricity:4,
 		Tags = AnySurfaceCraft,
 		category = Electrical,
 		xpAward = Electricity:10,
