@@ -143,45 +143,6 @@ function drawRemote(c, ox, oy, s) {
   fillCircle(c, x0 + w / 2, y0 + Math.round(76 * s), Math.round(3.5 * s), GREEN);
 }
 
-// ---------- garage door icon (128x128) ----------
-function drawGarageDoor(c) {
-  // frame
-  fillRoundRect(c, 8, 4, 120, 124, 6, BODY_DARK);
-  fillRoundRect(c, 14, 10, 114, 118, 4, PANEL);
-  // panels (horizontal bands)
-  for (let i = 0; i < 4; i++) {
-    const y0 = 18 + i * 26;
-    fillRect(c, 20, y0, 108, y0 + 14, PANEL_DARK);
-    fillRect(c, 20, y0 + 14, 108, y0 + 24, PANEL);
-  }
-  // vertical lines (roller door segments)
-  for (let x = 30; x < 104; x += 16) {
-    fillRect(c, x, 18, x + 2, 104, PANEL_DARK);
-  }
-  // handle
-  fillRect(c, 58, 96, 70, 104, BODY_DARK);
-  fillCircle(c, 64, 106, 4, BODY_DARK);
-}
-
-// ---------- fence gate icon (128x128) ----------
-function drawFenceGate(c) {
-  fillRect(c, 4, 30, 10, 96, BODY_DARK);       // left post
-  fillRect(c, 118, 30, 124, 96, BODY_DARK);    // right post
-  // cross bars
-  fillRect(c, 10, 44, 118, 50, PANEL_DARK);
-  fillRect(c, 10, 78, 118, 84, PANEL_DARK);
-  // mesh
-  for (let y = 50; y < 78; y += 5)
-    for (let x = 16; x < 112; x += 7) {
-      setPx(c, x, y, PANEL_DARK[0], PANEL_DARK[1], PANEL_DARK[2], 255);
-    }
-  // diagonal brace
-  for (let i = 0; i < 80; i++) {
-    const x = 16 + i, y = 88 - i;
-    setPx(c, x, y, PANEL_DARK[0], PANEL_DARK[1], PANEL_DARK[2], 255);
-  }
-}
-
 // ---------- poster (512x256) ----------
 function drawPoster() {
   const c = canvas(512, 256);
@@ -276,13 +237,5 @@ writePNG(motorIcon, path.join(texDir, "Item_AutoDoorMotor.png"));
 const magazineIcon = canvas(128, 128);
 drawMagazine(magazineIcon);
 writePNG(magazineIcon, path.join(texDir, "Item_AutoDoorMagazine.png"));
-
-const garageIcon = canvas(128, 128);
-drawGarageDoor(garageIcon);
-writePNG(garageIcon, path.join(texDir, "Item_AutoGarageDoor.png"));
-
-const fenceIcon = canvas(128, 128);
-drawFenceGate(fenceIcon);
-writePNG(fenceIcon, path.join(texDir, "Item_AutoFenceGate.png"));
 
 writePNG(drawPoster(), path.join(root, "poster.png"));

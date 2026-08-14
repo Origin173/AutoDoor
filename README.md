@@ -62,7 +62,7 @@
 - [ ] 车外按 K / 右键遥控器：门开/关正常
 - [ ] 配对性：A 遥控器安装的门，B 遥控器按 K 无反应（B 未配对该门）
 - [ ] 一把遥控器安装多扇门：都能开
-- [ ] 锁定门：右键门"锁定"→ 遥控器按 K 自动解锁并打开；无钥匙时不响应并播放提示音
+- [ ] 锁定门：右键门"锁定"→ 遥控器按 K 不响应（播放"已上锁"提示音）
 - [ ] 重新配对：换一把遥控器后，旧遥控器失效、新遥控器可开
 - [ ] 移除自动开门器：门恢复普通原版门，遥控器按键无反应
 - [ ] 改键：选项→按键 → [AutoDoor] 分类下改键后仍可触发
@@ -80,7 +80,6 @@
 - **MP**：配对走 vanilla 先例（`transmitModData`、`syncItemModData`、
   `syncIsoObject`），已在设计上对齐；深度联机场景（双人同时配对同一把遥控器）未做
   并发处理。
-- 与旧版（建造式）存档兼容：旧建造的门仍可用旧遥控器开；旧钥匙物品保留定义。
 
 ## 文件结构（B42 标准布局，参照官方 wiki Mod structure）
 ```
@@ -91,14 +90,15 @@ poster.png
 │   ├── poster.png
 │   └── media/
 │       ├── scripts/
-│       │   ├── items_AutoDoor.txt      # 遥控器（+旧版钥匙，兼容存档）物品定义
-│       │   └── recipes_AutoDoor.txt    # 遥控器制作配方（craftRecipe, 电学1级）
+│       │   ├── items_AutoDoor.txt      # 遥控器/自动门电机/杂志 物品定义
+│       │   └── recipes_AutoDoor.txt    # 遥控器+电机制作配方（craftRecipe, 需杂志解锁）
 │       ├── textures/                   # 自绘图标 (Item_*.png)
 │       └── lua/
-│           ├── shared/AutoDoor/AutoDoorDoorLib.lua        # 门识别/链/配对/遥控共享库
-│           ├── shared/Translate/{EN,CN}/AutoDoor.json     # 翻译
+│           ├── shared/AutoDoor/AutoDoorDoorLib.lua        # 门识别/链/配对/电量/遥控共享库
+│           ├── shared/Translate/{EN,CN}/ItemName.json 等  # 翻译（vanilla 同名文件，按键合并）
+│           ├── server/AutoDoor/AutoDoorDistribution.lua   # 杂志战利品（邮箱）
 │           └── client/AutoDoor/
-│               ├── AutoDoorInstallMenu.lua  # 右键门：安装/重新配对/移除
+│               ├── AutoDoorInstallMenu.lua  # 右键门：安装/重新配对/换电池/移除
 │               ├── AutoDoorRemote.lua       # 遥控核心逻辑 + 右键遥控器菜单
 │               └── AutoDoorKeybind.lua      # 按键注册（默认 K）+ 按键处理
 tools/gen_icons.js   # 图标/poster 生成器（Node，无依赖）

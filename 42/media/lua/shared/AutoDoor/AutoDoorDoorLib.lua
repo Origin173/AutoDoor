@@ -83,8 +83,7 @@ function AutoDoor.isBuiltDoor(object)
     return false
 end
 
--- True when the door has been automated by this mod
--- (installed opener, or a door built by the old version of the mod).
+-- True when the door has been automated by this mod.
 function AutoDoor.isAutoDoor(object)
     if not (instanceof(object, "IsoDoor") or instanceof(object, "IsoThumpable")) then
         return false
@@ -155,15 +154,12 @@ end
 -- Remote identity
 -- ------------------------------------------------------------
 
--- The pairing id of a remote. New remotes store it in their ModData
--- (set on first pairing); remotes from the old version of the mod
--- used the item keyId field instead.
+-- The pairing id of a remote, stored in its ModData (set on first
+-- pairing).
 function AutoDoor.getRemoteId(remote)
     if not remote then return nil end
     local id = remote:getModData().autoDoorRemoteId
     if id and id > 0 then return id end
-    local legacy = remote:getKeyId()
-    if legacy and legacy > 0 then return legacy end
     return nil
 end
 
@@ -281,12 +277,7 @@ function AutoDoor.doorMatchesRemote(door, remoteId)
     if not remoteId then return false end
     local md = door:getModData()
     if not md then return false end
-    if md.remoteKeyId ~= nil then
-        return md.remoteKeyId == remoteId
-    end
-    -- Doors built by the old version of this mod are paired through
-    -- the door's own keyId.
-    return md.autoDoor == true and door:getKeyId() == remoteId
+    return md.remoteKeyId == remoteId
 end
 
 -- ------------------------------------------------------------
