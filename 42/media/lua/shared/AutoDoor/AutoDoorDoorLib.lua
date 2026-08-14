@@ -169,8 +169,49 @@ function AutoDoor.getMotorCharge(door)
     return md and md.motorCharge or 0
 end
 
+-- The motor unit placed on the ground next to the door (nil when picked up).
+function AutoDoor.getMotorItem(door)
+    if not door then return nil end
+    local md = door:getModData()
+    if not md or not md.motorX then return nil end
+    local sq = getCell():getGridSquare(md.motorX, md.motorY, md.motorZ)
+    if not sq then return nil end
+    local world = sq:getWorldObjects()
+    for i = 0, world:size() - 1 do
+        local item = world:get(i)
+        if item and item:getModData and item:getModData().autoDoorMotor then
+            return item
+        end
+    end
+    return nil
+end
+
+-- True when the motor is charged and still sits next to the door.
 function AutoDoor.canOperate(door)
-    return AutoDoor.getMotorCharge(door) > 0
+    if not door then return false end
+    if AutoDoor.getMotorCharge(door) <= 0 then return false end
+    local md = door:getModData()
+    if not md or not md.motorX then return true end -- legacy installs without a placed motor
+    return AutoDoor.getMotorItem(door) ~= nil
+end
+
+-- First free square next to the door (beside it, then behind, then in front).
+function AutoDoor.findMotorSquare(door)
+    local anchor = AutoDoor.getDoorAnchor(door)
+    if not anchor then return nil end
+    local ax, ay, az = anchor:getX(), anchor:getY(), anchor:getZ()
+    local order = {
+        { ax - 1, ay }, { ax + 1, ay }, { ax, ay - 1 }, { ax, ay + 1 },
+        { ax - 2, ay }, { ax + 2, ay }, { ax, ay - 2 }, { ax, ay + 2 },
+        { ax - 1, ay - 1 }, { ax + 1, ay - 1 }, { ax - 1, ay + 1 }, { ax + 1, ay + 1 },
+    }
+    for _, c in ipairs(order) do
+        local sq = getCell():getGridSquare(c[1], c[2], az)
+        if sq and not sq:isSolid() and not sq:isSolidTrans() and sq:TreatAsSolidFloor() then
+            return sq
+        end
+    end
+    return nil
 end
 
 function AutoDoor.consumeMotorPower(door)
@@ -204,7 +245,17 @@ function AutoDoor.unpairDoor(door)
         local md = part:getModData()
         md.autoDoor = nil
         md.remoteKeyId = nil
+        md.motorX, md.motorY, md.motorZ = nil, nil, nil
         part:transmitModData()
+    end
+    -- The motor stays on the ground, unlinked, so it can be picked up again.
+    local motor = AutoDoor.getMotorItem(door)
+    if motor then
+        local mmd = motor:getModData()
+        mmd.doorX, mmd.doorY, mmd.doorZ = nil, nil, nil
+        if motor:getWorldItem() then
+            motor:getWorldItem():transmitCompleteItemToClients()
+        end
     end
 end
 

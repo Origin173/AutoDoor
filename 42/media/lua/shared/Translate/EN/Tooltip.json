@@ -1,5 +1,5 @@
 {
     "Tooltip_RemoteDoorOpener": "A handmade electronic remote.",
-    "Tooltip_AutoDoorMotor": "A combined signal receiver and electric motor. Install it on an unlocked garage door, fence gate or a door you built yourself to open and close it with a paired remote. Requires a battery to work: every open/close consumes charge. Replace the battery from the door's menu when it runs out.",
+    "Tooltip_AutoDoorMotor": "A combined signal receiver and electric motor. Install it on an unlocked garage door, fence gate or a door you built yourself: the unit is placed on the ground next to the door and pairs with your remote. Requires a battery to work: every open/close consumes charge. Replace the battery from the door's menu when it runs out.",
     "Tooltip_AutoDoorMagazine": "Reading it teaches you how to craft the auto door remote and the auto door motor recipes."
 }

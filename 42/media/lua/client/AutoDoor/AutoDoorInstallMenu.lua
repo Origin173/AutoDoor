@@ -13,19 +13,14 @@ function AutoDoorInstallMenu.findDoor(worldobjects)
     return nil
 end
 
--- Fresh install consumes one motor unit and one battery (its first battery).
+-- The server consumes the battery, places the motor next to the door and pairs it.
 function AutoDoorInstallMenu.onInstall(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
     local remote = AutoDoor.getRemote(player)
-    local motor = AutoDoor.getMotor(player)
-    local battery = AutoDoor.getBattery(player)
-    if not remote or not motor or not battery then return end
-    if AutoDoor.pairDoor(player, door, remote) then
-        motor:getContainer():Remove(motor)
-        battery:getContainer():Remove(battery)
-        getSoundManager():playUISound("UIActivateButton")
-    end
+    if not remote then return end
+    AutoDoor.ensureRemoteId(player, remote) -- pairing id is generated and synced client-side
+    sendClientCommand(player, "AutoDoor", "Install", { x = door:getX(), y = door:getY(), z = door:getZ() })
 end
 
 -- Re-pairs the door with a different remote (no motor needed).
@@ -34,25 +29,21 @@ function AutoDoorInstallMenu.onRePair(playerNum, door)
     if not player then return end
     local remote = AutoDoor.getRemote(player)
     if not remote then return end
-    if AutoDoor.pairDoor(player, door, remote) then
-        getSoundManager():playUISound("UIActivateButton")
-    end
+    AutoDoor.ensureRemoteId(player, remote)
+    sendClientCommand(player, "AutoDoor", "Repair", { x = door:getX(), y = door:getY(), z = door:getZ() })
 end
 
 -- Consumes one battery and refills the motor to full charge.
 function AutoDoorInstallMenu.onReplaceBattery(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
-    local battery = AutoDoor.getBattery(player)
-    if not battery then return end
-    battery:getContainer():Remove(battery)
-    AutoDoor.refillBattery(door)
-    getSoundManager():playUISound("UIActivateButton")
+    sendClientCommand(player, "AutoDoor", "ReplaceBattery", { x = door:getX(), y = door:getY(), z = door:getZ() })
 end
 
 function AutoDoorInstallMenu.onUnpair(playerNum, door)
-    AutoDoor.unpairDoor(door)
-    getSoundManager():playUISound("UIActivateButton")
+    local player = getSpecificPlayer(playerNum)
+    if not player then return end
+    sendClientCommand(player, "AutoDoor", "Uninstall", { x = door:getX(), y = door:getY(), z = door:getZ() })
 end
 
 local function hasRemote(playerObj)
@@ -190,4 +181,13 @@ function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
     end
 end
 
+-- Server-confirmed UI sound (install/remove actions run server-side).
+local function onServerCommand(module, command, args)
+    if module ~= "AutoDoor" or command ~= "Sound" then return end
+    if args and args.sound then
+        getSoundManager():playUISound(args.sound)
+    end
+end
+
 Events.OnFillWorldObjectContextMenu.Add(AutoDoorInstallMenu.doDoorMenu)
+Events.OnServerCommand.Add(onServerCommand)

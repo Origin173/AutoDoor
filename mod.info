@@ -1,6 +1,6 @@
 name=Auto Door Remote
 id=AutoDoorRemote
-description=Turn vanilla garage doors and fence gates into remote-controlled auto doors. Craft a remote control, right-click a door to install and pair it - one remote can pair many doors, and you can remove the opener at any time. Keep the remote in your inventory and press K (rebindable) to open or close your doors from the driver's seat, no need to get out of the car. Locked doors still need their original key.
+description=Turn vanilla garage doors and fence gates into remote-controlled auto doors. Craft a remote control, right-click a door to install and pair it - the motor unit is placed on the ground next to the door - one remote can pair many doors, and you can remove the opener at any time. Keep the remote in your inventory and press K (rebindable) to open or close your doors from the driver's seat, no need to get out of the car. Locked doors still need their original key.
 poster=poster.png
 author=Origin173
 versionMin=42.0
