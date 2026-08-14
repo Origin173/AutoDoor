@@ -13,7 +13,7 @@
 - **不绕过门锁**：上锁的门无法安装，遥控器对已锁的门不响应
 
 ## 安装
-1. 把 `mod.info`、`poster.png`、`42/` 放入 `C:\Users\<用户名>\Zomboid\mods\AutoDoorRemote\`（B42 只识别 `Zomboid\mods\` 与 `Zomboid\Workshop\` 两个目录）
+1. 把 `mod.info`、`poster.png`、`42/` 放入 `C:\Users\<用户名>\Zomboid\mods\AutoDoor\`（B42 只识别 `Zomboid\mods\` 与 `Zomboid\Workshop\` 两个目录）
 2. 启动游戏 → 主菜单 **Mods** → 勾选 `Auto Door`
 
 ## 使用
