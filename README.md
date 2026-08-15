@@ -41,16 +41,6 @@ C:\Users\<用户名>\Zomboid\mods\AutoDoor\
 
 ## 更新日志
 
-### v1.3 — 2026-08-15
-
-**新增**
-- **安装/移除有进度条和动作**：安装开门器、移除开门器、拆解电机现在都走原版时间动作——角色蹲下操作（Loot 动画），屏幕下方显示进度条，物品上显示进度环，动作完成才生效；走动等会打断动作
-
-**修复**
-- **移除开门器不返还电机和电池**：移除开门器现在会把地上的电机和剩余电量对应的电池一起返还背包，再解除配对；同时修复 `unpairDoor` 先清掉电机坐标、导致之后找不到电机的顺序错误
-- **电机放置位置**：放置锚点从「右键点到的那一段门」改为门体末端的门柱，多格车库门/双开门无论点门的哪一段，电机都固定落在同一侧门柱旁的地上，不再出现在门洞中间
-- **联机同步**：返还/拾取电机改用原版 `sendAddItemToContainer` + `transmitRemoveItemFromSquare` 流程（原 `sendItemChangeToClients` 在 B42 中不存在，联机时会导致返还物品不同步/报错）
-
 ### v1.2 — 2026-08-15
 
 **修复**
@@ -60,12 +50,16 @@ C:\Users\<用户名>\Zomboid\mods\AutoDoor\
 - **失效 API 调用**：移除 `placeMotor` / `unpairDoor` 中已不存在的 `getWorldItem()` 链式调用；`instanceof` 类名从错误的 `IsoWorldInventoryItem` 修正为 `IsoWorldInventoryObject`。
 - **电机放置时反复报错 (`transmitCompleteItemToClients`)**：PZ 42.x 的 `IsoWorldInventoryObject` 已不再提供 `transmitCompleteItemToClients` 方法，调用即触发 `attempt to call a nil method` 错误。`AddWorldInventoryItem` 已自带 MP 广播，因此 `placeMotor` / `unpairDoor` 中两处调用全部移除，改为通过内层 `InventoryItem:transmitModData()` 同步 `autoDoorMotor` / `doorX/Y/Z` 标记。
 - **电机世界模型跨格 + 找不到 square 报错**：`Amplifier` sprite 横跨 2 格，门旁单格空地放不下，导致 `AddWorldInventoryItem` 后 `worldItem:getSquare()` 返回空、随后任何同步调用崩溃。改为单格 sprite `Generator`，与原版 `Base.Generator` 尺寸一致。
+- **移除开门器不返还电机和电池**：移除开门器现在会把地上的电机和剩余电量对应的电池一起返还背包，再解除配对；同时修复 `unpairDoor` 先清掉电机坐标、导致之后找不到电机的顺序错误。
+- **电机放置位置**：放置锚点从「右键点到的那一段门」改为门体末端的门柱，多格车库门/双开门无论点门的哪一段，电机都固定落在同一侧门柱旁的地上，不再出现在门洞中间。
+- **联机同步**：返还/拾取电机改用原版 `sendAddItemToContainer` + `transmitRemoveItemFromSquare` 流程（原 `sendItemChangeToClients` 在 B42 中不存在，联机时会导致返还物品不同步/报错）。
 
 **新增**
 - **右键地面电机菜单**：右键放在地上的自动门电机，出现「自动门电机」子菜单：
   - **安装电池**：消耗背包里 1 个电池，为电机充满电
   - **拆下电池**：返还一个电量与当前剩余成比例的电池，电机保留原位但放电
   - **拆解电机**：拾取电机（若有剩余电量同时返还电池），并解除门的配对；对已解绑的孤儿电机也可直接拾取
+- **安装/移除有进度条和动作**：安装开门器、移除开门器、拆解电机现在都走原版时间动作——角色蹲下操作（Loot 动画），屏幕下方显示进度条，物品上显示进度环，动作完成才生效；走动等会打断动作
 
 **调整**
 - 更新中英文翻译与电机物品说明，描述新的电池拆装方式
