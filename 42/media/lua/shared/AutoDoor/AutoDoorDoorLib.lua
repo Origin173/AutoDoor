@@ -313,7 +313,8 @@ function AutoDoor.unpairDoor(door)
     -- The motor stays on the ground, unlinked, so it can be picked up again.
     local motorWorldItem = AutoDoor.getMotorItem(door)
     if motorWorldItem then
-        local inv = motorWorldItem:getItem and motorWorldItem:getItem()
+        -- Note: `obj:method and obj:method()` is a Lua syntax error; use a dot index for the guard.
+        local inv = motorWorldItem.getItem and motorWorldItem:getItem()
         if inv then
             local mmd = inv:getModData()
             mmd.doorX, mmd.doorY, mmd.doorZ = nil, nil, nil
