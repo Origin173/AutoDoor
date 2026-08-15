@@ -313,10 +313,17 @@ function AutoDoor.unpairDoor(door)
     -- The motor stays on the ground, unlinked, so it can be picked up again.
     local motorWorldItem = AutoDoor.getMotorItem(door)
     if motorWorldItem then
-        local mmd = motorWorldItem:getItem():getModData()
-        mmd.doorX, mmd.doorY, mmd.doorZ = nil, nil, nil
-        mmd.autoDoorMotor = nil
-        motorWorldItem:transmitCompleteItemToClients()
+        local inv = motorWorldItem:getItem and motorWorldItem:getItem()
+        if inv then
+            local mmd = inv:getModData()
+            mmd.doorX, mmd.doorY, mmd.doorZ = nil, nil, nil
+            mmd.autoDoorMotor = nil
+            -- B42: transmitCompleteItemToClients is no longer exposed by
+            -- IsoWorldInventoryObject; sync the inner InventoryItem's ModData instead.
+            if inv.transmitModData then
+                inv:transmitModData()
+            end
+        end
     end
 end
 

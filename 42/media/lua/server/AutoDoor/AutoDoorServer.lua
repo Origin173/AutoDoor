@@ -91,7 +91,15 @@ local function placeMotor(player, motor, door, sq)
     local worldItem = sq:AddWorldInventoryItem(motor, ox, oy, 0, false)
     if worldItem then
         worldItem:setIgnoreRemoveSandbox(true)
-        worldItem:transmitCompleteItemToClients()
+        -- B42: the IsoWorldInventoryObject no longer exposes transmitCompleteItemToClients,
+        -- and AddWorldInventoryItem already broadcasts the new world item over MP.
+        -- We only need to sync the inner InventoryItem's ModData (autoDoorMotor flag,
+        -- doorX/Y/Z) so the client picks it up. transmitModData on the InventoryItem
+        -- covers that; if the method is unavailable on a given build, fall back silently.
+        local inv = worldItem:getItem and worldItem:getItem()
+        if inv and inv.transmitModData then
+            inv:transmitModData()
+        end
     end
     removeFromPlayer(player, motor)
     return worldItem ~= nil
