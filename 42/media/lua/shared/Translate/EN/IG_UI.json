@@ -18,5 +18,8 @@
     "IGUI_AutoDoor_RemoveBattery": "Remove Battery",
     "IGUI_AutoDoor_UninstallMotor": "Pick Up Motor",
     "IGUI_AutoDoor_MotorNotLinked": "This motor is not installed on a door",
+    "IGUI_AutoDoor_Installing": "Installing Auto Door Motor",
+    "IGUI_AutoDoor_Removing": "Removing Auto Door Opener",
+    "IGUI_AutoDoor_PickingUp": "Picking Up Motor",
     "Open Door With Remote": "Open Door With Remote"
 }

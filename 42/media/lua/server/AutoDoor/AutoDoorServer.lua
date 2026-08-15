@@ -31,18 +31,23 @@ end
 -- Adds an item to the player inventory and syncs it to clients.
 local function giveItem(player, item)
     if not item then return end
-    player:getInventory():AddItem(item)
+    local inv = player:getInventory()
+    inv:AddItem(item)
     if isServer() then
-        sendItemChangeToClients(item)
+        sendAddItemToContainer(inv, item)
     end
 end
 
--- Removes a world item (the motor) from the world square.
+-- Removes a world item (the motor) from the world square. Mirrors the
+-- vanilla pickup flow (ISGrabItemAction) so multiplayer clients see it.
 local function removeWorldItem(worldItem)
     if not worldItem then return end
     local sq = worldItem:getSquare()
     if sq then
-        sq:RemoveWorldObject(worldItem)
+        sq:transmitRemoveItemFromSquare(worldItem)
+        worldItem:removeFromWorld()
+        worldItem:removeFromSquare()
+        worldItem:setSquare(nil)
     end
 end
 
@@ -71,7 +76,7 @@ end
 
 -- Drops the motor item on the square, offset toward the door post (corner).
 local function placeMotor(player, motor, door, sq)
-    local anchor = AutoDoor.getDoorAnchor(door)
+    local anchor = AutoDoor.getDoorPost(door)
     local md = motor:getModData()
     md.autoDoorMotor = true
     md.doorX, md.doorY, md.doorZ = anchor:getX(), anchor:getY(), anchor:getZ()
@@ -159,7 +164,26 @@ local function OnClientCommand(module, command, player, args)
             playSound(player, "UIActivateButton")
         elseif command == "Uninstall" then
             if not AutoDoor.isAutoDoor(door) then return end
+            -- Return the motor (and any remaining battery) to the player.
+            -- Must look the motor up before unpairing, which clears the
+            -- door's motor square info.
+            local charge = AutoDoor.getMotorCharge(door)
+            local motorWorldItem = AutoDoor.getMotorItem(door)
+            if motorWorldItem then
+                local invItem = motorWorldItem:getItem()
+                if invItem then
+                    local mmd = invItem:getModData()
+                    mmd.autoDoorMotor = nil
+                    mmd.doorX, mmd.doorY, mmd.doorZ = nil, nil, nil
+                    if invItem.setWorldItem then invItem:setWorldItem(nil) end
+                    giveItem(player, invItem)
+                end
+                removeWorldItem(motorWorldItem)
+            end
             AutoDoor.unpairDoor(door)
+            if charge > 0 then
+                giveItem(player, makeBattery(charge / AutoDoor.MOTOR_MAX_CHARGE))
+            end
             playSound(player, "UIActivateButton")
         end
         return
@@ -179,6 +203,7 @@ local function OnClientCommand(module, command, player, args)
                     local mmd = invItem:getModData()
                     mmd.autoDoorMotor = nil
                     mmd.doorX, mmd.doorY, mmd.doorZ = nil, nil, nil
+                    if invItem.setWorldItem then invItem:setWorldItem(nil) end
                     giveItem(player, invItem)
                     removeWorldItem(worldItem)
                     playSound(player, "UIActivateButton")
@@ -195,6 +220,7 @@ local function OnClientCommand(module, command, player, args)
                 local mmd = invItem:getModData()
                 mmd.autoDoorMotor = nil
                 mmd.doorX, mmd.doorY, mmd.doorZ = nil, nil, nil
+                if invItem.setWorldItem then invItem:setWorldItem(nil) end
                 giveItem(player, invItem)
             end
             removeWorldItem(worldItem)

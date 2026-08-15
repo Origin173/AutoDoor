@@ -111,6 +111,15 @@ function AutoDoor.getDoorAnchor(door)
     return parts[1] or door
 end
 
+-- The end part of a door unit (a stable "post" side). Used as the placement
+-- anchor so the motor always lands next to the same end of the door, no matter
+-- which part of the door the player right-clicked.
+function AutoDoor.getDoorPost(door)
+    if not door then return nil end
+    local parts = AutoDoor.getDoorParts(door)
+    return parts[#parts] or door
+end
+
 -- Pairing id stored on the remote's ModData.
 function AutoDoor.getRemoteId(remote)
     if not remote then return nil end
@@ -243,7 +252,7 @@ end
 -- instead of blocking the doorway. Orthogonal neighbours and 2-tile offsets
 -- are used as fallback only.
 function AutoDoor.findMotorSquare(door)
-    local anchor = AutoDoor.getDoorAnchor(door)
+    local anchor = AutoDoor.getDoorPost(door)
     if not anchor then return nil end
     local ax, ay, az = anchor:getX(), anchor:getY(), anchor:getZ()
     local order = {
@@ -302,6 +311,9 @@ end
 -- Removes the opener; the door becomes a plain vanilla door again.
 function AutoDoor.unpairDoor(door)
     if not door then return end
+    -- Grab the motor BEFORE clearing the door's motor square info below,
+    -- otherwise getMotorItem() can no longer find it.
+    local motorWorldItem = AutoDoor.getMotorItem(door)
     local parts = AutoDoor.getDoorParts(door)
     for _, part in ipairs(parts) do
         local md = part:getModData()
@@ -311,7 +323,6 @@ function AutoDoor.unpairDoor(door)
         part:transmitModData()
     end
     -- The motor stays on the ground, unlinked, so it can be picked up again.
-    local motorWorldItem = AutoDoor.getMotorItem(door)
     if motorWorldItem then
         -- Note: `obj:method and obj:method()` is a Lua syntax error; use a dot index for the guard.
         local inv = motorWorldItem.getItem and motorWorldItem:getItem()

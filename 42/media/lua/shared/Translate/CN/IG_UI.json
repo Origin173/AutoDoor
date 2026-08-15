@@ -18,5 +18,8 @@
     "IGUI_AutoDoor_RemoveBattery": "拆下电池",
     "IGUI_AutoDoor_UninstallMotor": "拆解电机",
     "IGUI_AutoDoor_MotorNotLinked": "此电机未安装在门上",
+    "IGUI_AutoDoor_Installing": "正在安装自动开门器",
+    "IGUI_AutoDoor_Removing": "正在移除自动开门器",
+    "IGUI_AutoDoor_PickingUp": "正在拆解电机",
     "Open Door With Remote": "用遥控器开门"
 }

@@ -1,5 +1,6 @@
 -- Client door context menu: install, re-pair, replace battery, uninstall.
 require "AutoDoor/AutoDoorDoorLib"
+require "AutoDoor/AutoDoorActions"
 
 AutoDoorInstallMenu = {}
 
@@ -24,13 +25,12 @@ function AutoDoorInstallMenu.findMotorWorldObject(worldobjects)
 end
 
 -- The server consumes the battery, places the motor next to the door and pairs it.
+-- Runs as a timed action (progress bar + crouch animation) on the client.
 function AutoDoorInstallMenu.onInstall(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
-    local remote = AutoDoor.getRemote(player)
-    if not remote then return end
-    AutoDoor.ensureRemoteId(player, remote) -- pairing id is generated and synced client-side
-    sendClientCommand(player, "AutoDoor", "Install", { x = door:getX(), y = door:getY(), z = door:getZ() })
+    if not AutoDoor.getRemote(player) then return end
+    ISTimedActionQueue.add(ISAutoDoorAction:new(player, door, nil, "install"))
 end
 
 -- Re-pairs the door with a different remote (no motor needed).
@@ -50,19 +50,20 @@ function AutoDoorInstallMenu.onReplaceBattery(playerNum, door)
     sendClientCommand(player, "AutoDoor", "ReplaceBattery", { x = door:getX(), y = door:getY(), z = door:getZ() })
 end
 
+-- Removes the opener (returns the motor + remaining battery server-side).
+-- Runs as a timed action (progress bar + crouch animation) on the client.
 function AutoDoorInstallMenu.onUnpair(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
-    sendClientCommand(player, "AutoDoor", "Uninstall", { x = door:getX(), y = door:getY(), z = door:getZ() })
+    ISTimedActionQueue.add(ISAutoDoorAction:new(player, door, nil, "uninstall"))
 end
 
 -- Remove the motor from the world and return it (plus any leftover battery) to the player.
+-- Runs as a timed action (progress bar + crouch animation) on the client.
 function AutoDoorInstallMenu.onUninstallMotor(playerNum, motorWorldItem)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
-    local sq = motorWorldItem:getSquare()
-    sendClientCommand(player, "AutoDoor", "UninstallMotor",
-        { x = sq:getX(), y = sq:getY(), z = sq:getZ() })
+    ISTimedActionQueue.add(ISAutoDoorAction:new(player, nil, motorWorldItem, "pickup"))
 end
 
 -- Take the battery out of the placed motor (returns a battery to the player).
