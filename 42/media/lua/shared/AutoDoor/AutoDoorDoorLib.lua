@@ -179,7 +179,7 @@ function AutoDoor.getMotorItem(door)
     local world = sq:getWorldObjects()
     for i = 0, world:size() - 1 do
         local item = world:get(i)
-        if item and item:getModData and item:getModData().autoDoorMotor then
+        if item and item.getModData and item:getModData().autoDoorMotor then
             return item
         end
     end
