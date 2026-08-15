@@ -45,7 +45,7 @@ C:\Users\<用户名>\Zomboid\mods\AutoDoor\
 
 **修复**
 - **配对后无法使用**：`getMotorItem` 原先在 `IsoWorldInventoryObject` 上查 ModData，但 `autoDoorMotor` 标记实际写在内部 `InventoryItem` 的 ModData 上，导致电机永远找不到、`canOperate` 恒为 false、遥控器按了没反应。已修正为通过 `getItem():getModData()` 查找。
-- **电机世界模型过小**：地面电机从 `RadioReceiver_Ground`（收音机）改为 `Amplifier`（功放），体积更大、更容易看见。
+- **电机世界模型过小/跨格报错**：地面电机从 `Amplifier`（功放，跨 2 格→放到门侧单格时 `transmitCompleteItemToClients` 因找不到 square 报错）改为 `Generator`（原版发电机大小，单格），与原版 `Base.Generator` 尺寸一致。
 - **电机挡在门口正中**：放置算法改为优先选择门柱对角角落，不再堵在门口；地面偏移也加大到 0.25/0.75，让电机紧贴门柱。
 - **失效 API 调用**：移除 `placeMotor` / `unpairDoor` 中已不存在的 `getWorldItem()` 链式调用；`instanceof` 类名从错误的 `IsoWorldInventoryItem` 修正为 `IsoWorldInventoryObject`。
 

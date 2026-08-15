@@ -19,7 +19,7 @@ module Base
         Weight = 1.5,
         Icon = AutoDoorMotor,
         DisplayName = AutoDoorMotor,
-        WorldStaticModel = Amplifier,
+        WorldStaticModel = Generator,
         MetalValue = 7.0,
         Tags = base:hasmetal,
         Tooltip = Tooltip_AutoDoorMotor,
