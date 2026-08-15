@@ -13,5 +13,10 @@
     "IGUI_AutoDoor_NoDoorInRange": "No paired auto door in range",
     "IGUI_AutoDoor_DoorLocked": "Door is locked",
     "IGUI_AutoDoor_DebugSpawnRemote": "Debug: Spawn Paired Remote",
+    "IGUI_AutoDoor_MotorMenu": "Auto Door Motor",
+    "IGUI_AutoDoor_InstallBattery": "Install Battery",
+    "IGUI_AutoDoor_RemoveBattery": "Remove Battery",
+    "IGUI_AutoDoor_UninstallMotor": "Pick Up Motor",
+    "IGUI_AutoDoor_MotorNotLinked": "This motor is not installed on a door",
     "Open Door With Remote": "Open Door With Remote"
 }

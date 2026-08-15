@@ -13,6 +13,16 @@ function AutoDoorInstallMenu.findDoor(worldobjects)
     return nil
 end
 
+-- Finds a placed motor world item among the right-clicked world objects.
+function AutoDoorInstallMenu.findMotorWorldObject(worldobjects)
+    if not worldobjects then return nil end
+    for _, obj in ipairs(worldobjects) do
+        local motor = AutoDoor.getMotorFromWorldObject(obj)
+        if motor then return motor end
+    end
+    return nil
+end
+
 -- The server consumes the battery, places the motor next to the door and pairs it.
 function AutoDoorInstallMenu.onInstall(playerNum, door)
     local player = getSpecificPlayer(playerNum)
@@ -44,6 +54,33 @@ function AutoDoorInstallMenu.onUnpair(playerNum, door)
     local player = getSpecificPlayer(playerNum)
     if not player then return end
     sendClientCommand(player, "AutoDoor", "Uninstall", { x = door:getX(), y = door:getY(), z = door:getZ() })
+end
+
+-- Remove the motor from the world and return it (plus any leftover battery) to the player.
+function AutoDoorInstallMenu.onUninstallMotor(playerNum, motorWorldItem)
+    local player = getSpecificPlayer(playerNum)
+    if not player then return end
+    local sq = motorWorldItem:getSquare()
+    sendClientCommand(player, "AutoDoor", "UninstallMotor",
+        { x = sq:getX(), y = sq:getY(), z = sq:getZ() })
+end
+
+-- Take the battery out of the placed motor (returns a battery to the player).
+function AutoDoorInstallMenu.onRemoveBattery(playerNum, motorWorldItem)
+    local player = getSpecificPlayer(playerNum)
+    if not player then return end
+    local sq = motorWorldItem:getSquare()
+    sendClientCommand(player, "AutoDoor", "RemoveBattery",
+        { x = sq:getX(), y = sq:getY(), z = sq:getZ() })
+end
+
+-- Install a battery from the player's inventory into the placed motor.
+function AutoDoorInstallMenu.onInstallBattery(playerNum, motorWorldItem)
+    local player = getSpecificPlayer(playerNum)
+    if not player then return end
+    local sq = motorWorldItem:getSquare()
+    sendClientCommand(player, "AutoDoor", "InstallBattery",
+        { x = sq:getX(), y = sq:getY(), z = sq:getZ() })
 end
 
 local function hasRemote(playerObj)
@@ -126,11 +163,59 @@ function AutoDoorInstallMenu.findDoorSubMenu(context)
     return nil
 end
 
-function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
-    local door = AutoDoorInstallMenu.findDoor(worldobjects)
-    if not door then return end
+-- Right-click menu shown when the player right-clicks the placed motor on the ground.
+function AutoDoorInstallMenu.doMotorMenu(playerNum, context, motorWorldItem)
     local player = getSpecificPlayer(playerNum)
     if not player or player:isDead() then return end
+
+    local door = AutoDoor.getDoorFromMotor(motorWorldItem)
+    local linked = door ~= nil
+    local charge = 0
+    if linked then
+        charge = AutoDoor.getMotorCharge(door)
+    end
+
+    local subMenu = ISContextMenu:getNew(context)
+    context:addSubMenu(context:addOption(AutoDoor.text("IGUI_AutoDoor_MotorMenu", "Auto Door Motor")), subMenu)
+
+    -- Install battery: requires a battery in the inventory and a linked door.
+    local installBatt = subMenu:addOption(AutoDoor.text("IGUI_AutoDoor_InstallBattery", "Install Battery"),
+        playerNum, AutoDoorInstallMenu.onInstallBattery, motorWorldItem)
+    if not linked or not hasBattery(player) then
+        installBatt.notAvailable = true
+        installBatt.onSelect = nil
+        installBatt.toolTip = batteryTooltip(player)
+    end
+
+    -- Remove battery: returns a battery reflecting the current charge.
+    local removeBatt = subMenu:addOption(AutoDoor.text("IGUI_AutoDoor_RemoveBattery", "Remove Battery"),
+        playerNum, AutoDoorInstallMenu.onRemoveBattery, motorWorldItem)
+    if not linked or charge <= 0 then
+        removeBatt.notAvailable = true
+        removeBatt.onSelect = nil
+        if not linked then
+            removeBatt.toolTip = makeTooltip(player, "IGUI_AutoDoor_MotorNotLinked",
+                "This motor is not installed on a door")
+        end
+    end
+
+    -- Dismantle: removes the motor (and any leftover battery) back to the player.
+    subMenu:addOption(AutoDoor.text("IGUI_AutoDoor_UninstallMotor", "Pick Up Motor"),
+        playerNum, AutoDoorInstallMenu.onUninstallMotor, motorWorldItem)
+end
+
+function AutoDoorInstallMenu.doDoorMenu(playerNum, context, worldobjects, test)
+    local player = getSpecificPlayer(playerNum)
+    if not player or player:isDead() then return end
+
+    -- Motor-on-the-ground context menu: dismantle / remove battery / install battery.
+    local motorWorldItem = AutoDoorInstallMenu.findMotorWorldObject(worldobjects)
+    if motorWorldItem then
+        AutoDoorInstallMenu.doMotorMenu(playerNum, context, motorWorldItem)
+    end
+
+    local door = AutoDoorInstallMenu.findDoor(worldobjects)
+    if not door then return end
 
     local menu = AutoDoorInstallMenu.findDoorSubMenu(context) or context
 

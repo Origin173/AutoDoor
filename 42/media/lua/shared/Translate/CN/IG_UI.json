@@ -13,5 +13,10 @@
     "IGUI_AutoDoor_NoDoorInRange": "范围内没有配对的自动门",
     "IGUI_AutoDoor_DoorLocked": "门已上锁",
     "IGUI_AutoDoor_DebugSpawnRemote": "调试: 生成配对遥控器",
+    "IGUI_AutoDoor_MotorMenu": "自动门电机",
+    "IGUI_AutoDoor_InstallBattery": "安装电池",
+    "IGUI_AutoDoor_RemoveBattery": "拆下电池",
+    "IGUI_AutoDoor_UninstallMotor": "拆解电机",
+    "IGUI_AutoDoor_MotorNotLinked": "此电机未安装在门上",
     "Open Door With Remote": "用遥控器开门"
 }

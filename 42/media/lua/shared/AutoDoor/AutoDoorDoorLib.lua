@@ -170,6 +170,7 @@ function AutoDoor.getMotorCharge(door)
 end
 
 -- The motor unit placed on the ground next to the door (nil when picked up).
+-- Returns the IsoWorldInventoryObject that wraps the motor InventoryItem.
 function AutoDoor.getMotorItem(door)
     if not door then return nil end
     local md = door:getModData()
@@ -178,10 +179,52 @@ function AutoDoor.getMotorItem(door)
     if not sq then return nil end
     local world = sq:getWorldObjects()
     for i = 0, world:size() - 1 do
-        local item = world:get(i)
-        if item and item.getModData and item:getModData().autoDoorMotor then
-            return item
+        local worldItem = world:get(i)
+        if worldItem and worldItem.getItem then
+            local invItem = worldItem:getItem()
+            if invItem and invItem.getModData and invItem:getModData().autoDoorMotor then
+                return worldItem
+            end
         end
+    end
+    return nil
+end
+
+-- Returns the underlying InventoryItem of the placed motor (nil when not found).
+function AutoDoor.getMotorInventoryItem(door)
+    local worldItem = AutoDoor.getMotorItem(door)
+    if not worldItem then return nil end
+    return worldItem:getItem()
+end
+
+-- Finds a placed motor world item directly from a world object (used by the
+-- right-click menu on the motor itself).
+function AutoDoor.getMotorFromWorldObject(worldObj)
+    if not worldObj then return nil end
+    if not instanceof(worldObj, "IsoWorldInventoryObject") then return nil end
+    local invItem = worldObj:getItem()
+    if invItem and invItem.getModData and invItem:getModData().autoDoorMotor then
+        return worldObj
+    end
+    return nil
+end
+
+-- Returns the door that a placed motor is linked to (nil if unlinked/picked up).
+function AutoDoor.getDoorFromMotor(worldObj)
+    local motorInv = nil
+    if instanceof(worldObj, "IsoWorldInventoryObject") then
+        motorInv = worldObj:getItem()
+    elseif instanceof(worldObj, "InventoryItem") then
+        motorInv = worldObj
+    end
+    if not motorInv then return nil end
+    local mmd = motorInv:getModData()
+    if not mmd or not mmd.doorX then return nil end
+    local sq = getCell():getGridSquare(mmd.doorX, mmd.doorY, mmd.doorZ)
+    if not sq then return nil end
+    for i = 0, sq:getObjects():size() - 1 do
+        local obj = sq:getObjects():get(i)
+        if AutoDoor.isAutoDoor(obj) then return obj end
     end
     return nil
 end
@@ -195,15 +238,23 @@ function AutoDoor.canOperate(door)
     return AutoDoor.getMotorItem(door) ~= nil
 end
 
--- First free square next to the door (beside it, then behind, then in front).
+-- First free square next to the door. We prefer the diagonal neighbours
+-- (the door-post / pillar corners) so the motor sits beside the door frame
+-- instead of blocking the doorway. Orthogonal neighbours and 2-tile offsets
+-- are used as fallback only.
 function AutoDoor.findMotorSquare(door)
     local anchor = AutoDoor.getDoorAnchor(door)
     if not anchor then return nil end
     local ax, ay, az = anchor:getX(), anchor:getY(), anchor:getZ()
     local order = {
-        { ax - 1, ay }, { ax + 1, ay }, { ax, ay - 1 }, { ax, ay + 1 },
-        { ax - 2, ay }, { ax + 2, ay }, { ax, ay - 2 }, { ax, ay + 2 },
+        -- door-post / pillar corners first (diagonal, beside the frame)
         { ax - 1, ay - 1 }, { ax + 1, ay - 1 }, { ax - 1, ay + 1 }, { ax + 1, ay + 1 },
+        -- then orthogonal neighbours (still beside the door, not in front)
+        { ax - 1, ay }, { ax + 1, ay }, { ax, ay - 1 }, { ax, ay + 1 },
+        -- wider fallback
+        { ax - 2, ay - 1 }, { ax + 2, ay - 1 }, { ax - 2, ay + 1 }, { ax + 2, ay + 1 },
+        { ax - 1, ay - 2 }, { ax + 1, ay - 2 }, { ax - 1, ay + 2 }, { ax + 1, ay + 2 },
+        { ax - 2, ay }, { ax + 2, ay }, { ax, ay - 2 }, { ax, ay + 2 },
     }
     for _, c in ipairs(order) do
         local sq = getCell():getGridSquare(c[1], c[2], az)
@@ -237,6 +288,17 @@ function AutoDoor.refillBattery(door)
     end
 end
 
+-- Removes the battery: discharges the motor to zero.
+function AutoDoor.dischargeBattery(door)
+    if not door then return end
+    local parts = AutoDoor.getDoorParts(door)
+    for _, part in ipairs(parts) do
+        local md = part:getModData()
+        md.motorCharge = 0
+        part:transmitModData()
+    end
+end
+
 -- Removes the opener; the door becomes a plain vanilla door again.
 function AutoDoor.unpairDoor(door)
     if not door then return end
@@ -249,13 +311,12 @@ function AutoDoor.unpairDoor(door)
         part:transmitModData()
     end
     -- The motor stays on the ground, unlinked, so it can be picked up again.
-    local motor = AutoDoor.getMotorItem(door)
-    if motor then
-        local mmd = motor:getModData()
+    local motorWorldItem = AutoDoor.getMotorItem(door)
+    if motorWorldItem then
+        local mmd = motorWorldItem:getItem():getModData()
         mmd.doorX, mmd.doorY, mmd.doorZ = nil, nil, nil
-        if motor:getWorldItem() then
-            motor:getWorldItem():transmitCompleteItemToClients()
-        end
+        mmd.autoDoorMotor = nil
+        motorWorldItem:transmitCompleteItemToClients()
     end
 end
 
