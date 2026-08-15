@@ -41,7 +41,7 @@ C:\Users\<用户名>\Zomboid\mods\AutoDoor\
 
 ## 更新日志
 
-### v1.1 — 2026-08-15
+### v1.2 — 2026-08-15
 
 **修复**
 - **配对后无法使用**：`getMotorItem` 原先在 `IsoWorldInventoryObject` 上查 ModData，但 `autoDoorMotor` 标记实际写在内部 `InventoryItem` 的 ModData 上，导致电机永远找不到、`canOperate` 恒为 false、遥控器按了没反应。已修正为通过 `getItem():getModData()` 查找。
@@ -57,3 +57,7 @@ C:\Users\<用户名>\Zomboid\mods\AutoDoor\
 
 **调整**
 - 更新中英文翻译与电机物品说明，描述新的电池拆装方式
+
+### v1.1 - 2026-08-15
+**修复**
+- **语法错误**
