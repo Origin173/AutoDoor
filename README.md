@@ -41,6 +41,14 @@ C:\Users\<用户名>\Zomboid\mods\AutoDoor\
 
 ## 更新日志
 
+### v1.3 — 2026-08-16
+
+**修复**
+- **杂志刷新完全失效**：B42 把 `postbox`（邮箱）从 `ProceduralDistributions` 移到了 `Distributions`（mod 兼容别名 `SuburbsDistributions`），旧代码在 `ProceduralDistributions.list` 里找不到表，导致自动门杂志实际永远不会刷新。已改为直接修改 `SuburbsDistributions.all.postbox`。
+
+**调整**
+- **杂志刷新位置与概率匹配原版**：参照原版配方杂志（`MechanicMag1` 等）在各容器的刷新表，自动门杂志现在刷在相同位置、使用相同权重——邮箱 0.1、普通书架 0.1、杂志箱/图书馆/邮局/大学书架 1.0、书店 2.0。
+
 ### v1.2 — 2026-08-15
 
 **修复**
